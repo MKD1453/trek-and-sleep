@@ -736,3 +736,18 @@ nav .active{color:var(--green)}
 .v32TimelineIcon{width:42px;height:42px;border-radius:12px;background:#1b3729;display:flex;align-items:center;justify-content:center;font-size:24px}
 .v32TimelineItem b,.v32TimelineItem small{display:block}.v32TimelineItem small{font-size:9px;color:var(--muted);margin-top:2px}
 .v32TimelineItem strong{color:#9bea69}
+
+/* ===== Trek & Sleep V3.2.1 Simulator ===== */
+.simPanel{display:grid;gap:12px;margin-top:12px}
+.simCard{padding:14px;border:1px solid #345444;background:#102119;border-radius:16px}
+.simCard h3{margin:0 0 4px;font-size:20px}.simCard small{color:var(--muted)}
+.simGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.simMetric{background:#15261f;border-radius:12px;padding:11px}.simMetric b,.simMetric small{display:block}
+.simMetric b{font-size:18px}.simMetric small{font-size:9px;color:var(--muted);margin-top:3px}
+.simControls{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.simControls button{min-height:48px}
+.simRange{display:grid;gap:6px}
+.simRange input{width:100%}
+.simBadge{padding:5px 9px;border-radius:999px;background:#2b4320;color:#9bea69;font-weight:900}
+.simBadge.off{background:#3c2924;color:#ffb1a8}
+.simDeviation{display:flex;gap:8px;flex-wrap:wrap}

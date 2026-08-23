@@ -1,9 +1,9 @@
 {
-  "name": "Trek & Sleep V3.2",
+  "name": "Trek & Sleep V3.2.1",
   "short_name": "Trek & Sleep",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#07120e",
   "theme_color": "#07120e",
-  "description": "Trekking-App mit GPS-gesteuerter Live-Navigation, automatischem Manöverwechsel, Live-Distanz, Sprachansagen, Routenabweichungs-Hilfe, Offline-Touren, POIs und Höhenprofil."
+  "description": "Trekking-App mit Navigations-Simulator zum Testen von GPS-Fortschritt, Abbiegehinweisen, Routenabweichung, Ton, Vibration und Sprachansagen ohne vor Ort zu sein."
 }

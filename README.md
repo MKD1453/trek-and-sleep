@@ -1,25 +1,19 @@
-# Trek & Sleep V3.2
+# Trek & Sleep V3.2.1
 
-## GPS-gesteuerte Live-Navigation
-- nächster Abbiegehinweis wird aus der echten GPS-Position auf der GPX-Linie bestimmt
-- Entfernung zum Manöver zählt live herunter
-- nach dem Passieren wird automatisch auf den nächsten Hinweis gewechselt
-- optionaler zweiter Hinweis als Vorschau
-- Reststrecke, Fortschritt und GPS-Genauigkeit direkt im Live-HUD
-- bei Routenabweichung wird der Abbiegehinweis durch eine Rückkehranzeige ersetzt
-- grobe Rückkehrrichtung zur GPX-Linie
-- optionale deutsche Sprachansagen
-- Ton und Vibration aus V3.1.1 bleiben erhalten
+## Neuer Navigations-Simulator
+Mit dem Simulator lässt sich eine komplette Tour zuhause testen.
 
-## Vor-Tour-Schutz
-Alle Live-Hinweise bleiben im Anreise-/Vor-Tour-Modus deaktiviert.
+- virtuelle GPS-Position auf der geladenen GPX-Route
+- Simulation mit 1–8 km/h
+- +100 m / −100 m manuell springen
+- direkt zum nächsten Abbiegehinweis springen
+- Reststrecke und virtueller Fortschritt
+- 50 m / 100 m / 200 m Routenabweichung simulieren
+- Abbiegewarnung testen
+- Routenwarnung testen
+- Sprachansage testen
+- Live-HUD mit simuliertem GPS verwenden
 
-## Weiter enthalten
-- Trail-Navigation
-- Etappen-/Tagesplan
-- Offline-Tourpaket
-- Höhenprofil
-- Apple-Maps-Anreise
-- Tour-Cockpit, Warncenter, Rechts-Layer, POIs, Backup
+Während der Simulator aktiv ist, überschreibt echtes GPS die Testposition nicht.
 
-Für GitHub Pages wieder die sechs Dateien im bestehenden Repository ersetzen und committen.
+Alle Funktionen aus V3.2 bleiben erhalten.
