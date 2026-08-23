@@ -1,9 +1,9 @@
 {
-  "name": "Trek & Sleep V2.7",
+  "name": "Trek & Sleep V2.8",
   "short_name": "Trek & Sleep",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#07120e",
   "theme_color": "#07120e",
-  "description": "Bereinigte Basis mit einheitlicher Distanzberechnung und zentraler GPS-Navigation."
+  "description": "Trekking-App mit Tour-Cockpit, GPS-Anreise- und Live-Navigation, Höhenprofil, Sicherheitscenter, Offline-Tourdaten und Datenbackup."
 }
