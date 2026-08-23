@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07100e">
+<title>Trek & Sleep V2.7</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+<link rel="stylesheet" href="styles.css">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#07120e"></head>
+<body>
+<div id="app">
+<header class="top">
+  <div><div class="eyebrow">TREK & SLEEP · V2.7</div><h1>Karte</h1></div>
+  <div class="headerActions"><button id="warningBtn" class="warnPill">⚠ 0</button><button id="gpsBtn" class="pill">◎ GPS</button></div>
+</header>
+
+<div class="filters">
+ <button data-filter="all" class="chip active">Alle</button>
+ <button data-filter="drinking_water" class="chip">💧 Trinkwasser</button>
+ <button data-filter="water_source" class="chip">🌊 Quelle</button>
+ <button data-filter="shelter" class="chip">🏠 Hütten</button>
+ <button data-filter="camp" class="chip">⛺ Schlaf</button>
+ <button data-filter="parking" class="chip">🅿 Parken</button>
+ <button data-filter="emergency" class="chip">✚ Rettung</button>
+ <button data-filter="legal" class="chip">⚖ Regeln</button><button id="hazardLayerBtn" class="chip">⚠ Gefahren</button><button id="paceBtn" class="chip">🚶 4,0 km/h</button><button id="plannerBtn" class="chip">🗓 Tour planen</button><button id="mapPlanBtn" class="chip">📍 Punkte planen</button><button id="navStartBtn" class="chip">▶ Tour starten</button><button id="elevationBtn" class="chip">⛰ Profil</button><button id="tourOverviewBtn" class="chip">🧭 Tour-Check</button>
+</div>
+
+<main>
+ <div id="map"></div>
+
+ <section id="drawer" class="drawer drawer-half">
+  <div class="sheetControls">
+    <button id="sheetCompact" class="sheetBtn">▾ Kompakt</button>
+    <button id="sheetHalf" class="sheetBtn active">▬ Halb</button>
+    <button id="sheetFull" class="sheetBtn">▴ Groß</button>
+  </div>
+  <div class="handle"></div>
+
+  <div class="routeHead">
+   <div>
+    <strong id="routeName">Demo-Route Pfälzerwald</strong>
+    <div id="routeMeta" class="muted">Route bereit</div>
+   </div>
+   <div class="actions">
+    <button id="refreshBtn" class="round" title="Neu laden">↻</button>
+    <button id="saveTourBtn" class="round" title="Tour speichern">♡</button><button id="gpxBtn" class="gpx">GPX</button>
+   </div>
+   <input id="gpxInput" type="file" accept=".gpx,application/gpx+xml" hidden>
+  </div>
+
+  <div id="mapTourStatusHost"></div>
+
+  <div class="smartRow">
+    <span>
+      <b>Entlang deiner Route</b>
+      <small id="poiState">Echte OSM-Punkte laden</small>
+    </span>
+    <button id="loadPoisBtn" class="load">POIs laden</button>
+  </div>
+
+  <div id="progressBox" class="progressBox hidden">
+    <div class="progressTop">
+      <span><b id="progressLabel">Fortschritt</b><small id="progressText">GPS aktiv</small></span>
+      <strong id="progressPct">0%</strong>
+    </div>
+    <div class="progress"><i id="progressBar"></i></div>
+  </div>
+
+
+
+
+  <div id="turnCard" class="turnCard hidden">
+    <div class="turnIcon" id="turnIcon">↗</div>
+    <div>
+      <small>Nächster Richtungswechsel</small>
+      <b id="turnText">Route folgen</b>
+    </div>
+    <strong id="turnDistance">—</strong>
+  </div>
+
+  <div id="navStatus" class="navStatus hidden">
+    <div class="navStatusTop">
+      <span>
+        <b id="routeStateLabel">Auf Route</b>
+        <small id="routeStateMeta">GPS aktiv</small>
+      </span>
+      <strong id="routeDeviation">0 m</strong>
+    </div>
+    <div class="nextPoint">
+      <div class="nextPointIcon" id="nextPointIcon">↗</div>
+      <div>
+        <b id="nextPointName">Nächster wichtiger Punkt</b>
+        <small id="nextPointMeta">Wird mit GPS berechnet</small>
+      </div>
+      <strong id="nextPointDistance">—</strong>
+    </div>
+  </div>
+
+  <div id="alertBox" class="alertBox hidden">
+    <div id="alertIcon" class="alertIcon">!</div>
+    <div>
+      <b id="alertTitle">Hinweis</b>
+      <small id="alertText"></small>
+    </div>
+  </div>
+
+  <div id="legalSummary" class="legalSummary">
+    <div class="legalSummaryHead">
+      <span><b>⚖ Rechts-Layer</b><small id="legalState">Pfälzerwald · Quellen geprüft</small></span>
+      <button id="legalInfoBtn" class="legalBtn">Öffnen</button>
+    </div>
+    <div class="legalMiniGrid">
+      <span>Zelt <b>nur Plätze</b></span>
+      <span>Hängematte <b>?</b></span>
+      <span>Biwak <b>eingeschränkt</b></span>
+      <span>Feuer <b>verboten*</b></span>
+    </div>
+  </div>
+
+  <div id="poiList" class="poiList">
+    <div class="empty">Importiere deine GPX-Route oder nutze die Demo-Route und tippe anschließend auf <b>POIs laden</b>.</div>
+  </div>
+ </section>
+</main>
+
+<nav>
+ <button id="homeNav">⌂<span>Start</span></button>
+ <button class="active">⌖<span>Karte</span></button>
+ <button id="routeNav">↗<span>Touren</span></button>
+ <button id="planNav">＋<span>Planen</span></button>
+ <button id="moreNav">☰<span>Mehr</span></button>
+</nav>
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="sheet">
+    <button id="closeModal" class="close">×</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

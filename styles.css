@@ -1,0 +1,612 @@
+
+:root{
+  --bg:#06100d;--panel:#0d1815;--panel2:#14231e;--line:#263830;
+  --text:#f5f7f5;--muted:#9ba9a4;--green:#91db40;--blue:#4eb8ff;
+  --red:#ff6158;--yellow:#f3ba45;--orange:#ff9f43;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif}
+button{font:inherit}
+#app{max-width:560px;height:100%;margin:auto;background:var(--bg);position:relative;overflow:hidden}
+.top{
+  height:105px;padding:calc(19px + env(safe-area-inset-top)) 18px 13px;
+  display:flex;align-items:end;justify-content:space-between;border-bottom:1px solid var(--line);
+  background:#07110e;z-index:20;position:relative
+}
+.eyebrow{color:var(--green);font-size:11px;font-weight:900;letter-spacing:.15em}
+h1{font-size:31px;margin:4px 0 0}h2{margin:7px 0 12px}
+.pill{border:1px solid #34463e;background:#15231e;color:white;border-radius:999px;padding:10px 13px;font-weight:900}
+.filters{
+  height:52px;display:flex;gap:7px;overflow:auto;padding:8px 10px;background:#0a1512;
+  border-bottom:1px solid var(--line);position:relative;z-index:20
+}
+.chip{
+  white-space:nowrap;border:1px solid #2c3d36;background:#14211d;color:#c6d1cd;
+  border-radius:12px;padding:7px 10px;font-size:11px
+}
+.chip.active{background:#2a4b29;color:var(--green)}
+main{position:absolute;top:157px;bottom:82px;left:0;right:0}
+#map{height:100%;background:#b8c6a0}
+.leaflet-control-attribution{font-size:8px!important}
+.drawer{
+  position:absolute;left:8px;right:8px;bottom:8px;max-height:48%;
+  background:rgba(8,18,15,.97);border:1px solid #2c4037;border-radius:24px;
+  box-shadow:0 -15px 45px #0008;overflow:auto;z-index:700
+}
+.handle{width:42px;height:5px;background:#62716b;border-radius:9px;margin:8px auto 4px}
+.routeHead{
+  padding:7px 14px 11px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--line);gap:10px
+}
+.routeHead strong{display:block;font-size:17px}
+.muted{font-size:11px;color:var(--muted);margin-top:3px}
+.actions{display:flex;gap:7px}
+.round,.gpx,.load{border:0;font-weight:900}
+.round{width:38px;height:38px;border-radius:50%;background:#1a2923;color:white}
+.gpx,.load{border-radius:12px;background:var(--green);color:#08100b;padding:10px 12px}
+.smartRow{padding:11px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.smartRow b,.smartRow small{display:block}
+.smartRow small{color:var(--muted);font-size:10px;margin-top:3px}
+.progressBox{padding:0 14px 10px}
+.progressTop{display:flex;justify-content:space-between;align-items:end}
+.progressTop span b,.progressTop span small{display:block}
+.progressTop small{color:var(--muted);font-size:10px;margin-top:2px}
+.progress{height:7px;border-radius:8px;background:#24342d;margin-top:7px;overflow:hidden}
+.progress i{display:block;width:0;height:100%;background:var(--green);border-radius:8px}
+.hidden{display:none!important}
+.poiList{padding:0 12px 12px}
+.poi{
+  display:grid;grid-template-columns:38px 1fr auto;gap:9px;align-items:center;
+  padding:10px 2px;border-top:1px solid var(--line);cursor:pointer
+}
+.ico{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#16261f}
+.poi b{font-size:14px}
+.poi small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+.dist{text-align:right;font-weight:900;font-size:12px}
+.detour{display:block;color:var(--green);font-size:10px;margin-top:3px}
+.direction{display:inline-block;margin-top:4px;padding:3px 6px;border-radius:999px;font-size:9px;font-weight:900}
+.direction.ahead{background:#1b3b24;color:#9ee76a}
+.direction.behind{background:#31231e;color:#d0aaa1}
+.direction.near{background:#1b2d3b;color:#8fd0ff}
+.empty{padding:14px;color:var(--muted);font-size:12px;line-height:1.45;border-top:1px solid var(--line)}
+nav{
+  position:absolute;left:0;right:0;bottom:0;height:82px;background:#09120f;border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(5,1fr);z-index:900;padding-bottom:env(safe-area-inset-bottom)
+}
+nav button{border:0;background:transparent;color:#92a09b;font-size:22px;padding:8px 2px}
+nav span{display:block;font-size:11px;margin-top:3px}
+nav .active{color:var(--green)}
+.modal{position:fixed;inset:0;background:#000b;z-index:1200;display:flex;align-items:flex-end;justify-content:center}
+.sheet{
+  width:min(560px,100%);max-height:80vh;overflow:auto;background:#101b17;border:1px solid #2d4037;
+  border-radius:25px 25px 0 0;padding:18px 18px calc(20px + env(safe-area-inset-bottom))
+}
+.close{float:right;width:38px;height:38px;border:0;border-radius:50%;background:#293832;color:white;font-size:24px}
+.tag{display:inline-block;padding:6px 9px;border-radius:999px;background:#172820;color:var(--green);font-size:11px;font-weight:900}
+.detail{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);gap:12px}
+.detail span{color:#cbd3d0}
+.warning{
+  background:#211d12;border:1px solid #44391c;color:#ddd1aa;padding:12px;border-radius:14px;
+  font-size:11px;line-height:1.45;margin-top:13px
+}
+.source{font-size:11px;color:var(--muted);margin-top:12px}
+.loading{padding:18px;text-align:center;color:var(--green);font-weight:800}
+.score{font-size:10px;color:var(--muted);margin-top:4px}
+.water-safe{color:#8ed8ff}.water-unknown{color:#f2c26d}
+.legalBox{margin-top:12px;border:1px solid #31453a;border-radius:16px;overflow:hidden}
+.legalHead{padding:11px 12px;background:#15251f;font-weight:900}
+.legalRow{display:flex;justify-content:space-between;padding:10px 12px;border-top:1px solid var(--line);font-size:12px}
+.clusterCount{
+  width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
+  background:#1f6f43;color:#fff;font-weight:900;border:3px solid rgba(255,255,255,.8);
+  box-shadow:0 3px 12px #0006
+}
+
+/* V0.6 Bottom Sheet */
+.sheetControls{
+  display:flex;gap:7px;padding:7px 12px 3px;position:sticky;top:0;
+  background:linear-gradient(#0a1512,#0a1512ee);z-index:5
+}
+.sheetBtn{
+  flex:1;border:1px solid #2d4037;background:#15231e;color:#aebbb6;
+  border-radius:10px;padding:7px 6px;font-size:10px;font-weight:800
+}
+.sheetBtn.active{background:#2a4b29;color:var(--green)}
+.drawer{transition:max-height .22s ease,height .22s ease}
+.drawer-compact{max-height:24%!important}
+.drawer-half{max-height:48%!important}
+.drawer-full{max-height:78%!important}
+.drawer-compact .smartRow,
+.drawer-compact .progressBox,
+.drawer-compact .legalSummary,
+.drawer-compact .poiList{display:none}
+.drawer-full .poiList{padding-bottom:28px}
+
+.legalSummary{
+  margin:0 12px 10px;border:1px solid #31483d;border-radius:16px;
+  overflow:hidden;background:#101d18
+}
+.legalSummaryHead{
+  padding:10px 11px;display:flex;justify-content:space-between;align-items:center;gap:10px
+}
+.legalSummaryHead b,.legalSummaryHead small{display:block}
+.legalSummaryHead small{color:var(--muted);font-size:9px;margin-top:2px}
+.legalBtn{
+  border:0;background:#1b3025;color:var(--green);font-weight:900;
+  border-radius:10px;padding:8px 10px;font-size:10px
+}
+.legalMiniGrid{
+  display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)
+}
+.legalMiniGrid span{
+  display:flex;justify-content:space-between;padding:8px 10px;
+  font-size:10px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)
+}
+.legalMiniGrid span:nth-child(even){border-right:0}
+.legalMiniGrid b{color:var(--yellow)}
+
+.zoneBadge{
+  display:inline-block;padding:5px 8px;border-radius:999px;background:#2b2515;
+  color:#f0cf78;font-size:10px;font-weight:900;margin-top:8px
+}
+.ruleStatus{
+  display:inline-block;min-width:76px;text-align:center;padding:4px 7px;border-radius:999px;
+  background:#2b302d;font-size:10px;font-weight:900
+}
+.ruleStatus.unknown{color:#f3c76d}
+.ruleStatus.red{color:#ff9b94;background:#3c211f}
+.ruleStatus.green{color:#9ee76a;background:#1f3523}
+
+/* V0.7 Tourenbibliothek */
+.tourCard{border:1px solid #2b4036;border-radius:16px;padding:12px;margin:10px 0;background:#101d18}
+.tourTop{display:flex;justify-content:space-between;gap:10px}
+.tourTop b{font-size:14px}.tourMeta{font-size:10px;color:var(--muted);margin-top:4px}
+.tourActions{display:flex;gap:7px;margin-top:10px}
+.tourActions button{border:0;border-radius:10px;padding:8px 10px;font-weight:900;font-size:10px}
+.openTour{background:var(--green);color:#07100b}.deleteTour{background:#2b211f;color:#ffaaa4}
+.verified{color:#9ee76a}.restricted{color:#ffaaa4}.conditional{color:#f2c26d}
+.sourceLink{display:block;margin-top:8px;color:#9bd4ff;font-size:11px}
+
+.offlineBadge{display:inline-block;padding:5px 8px;border-radius:999px;background:#183222;color:#9ee76a;font-size:9px;font-weight:900;margin-top:6px}.offlineBox{border:1px solid #2b4036;background:#101d18;border-radius:16px;padding:12px;margin:10px 0}.offlineRow{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #263a31}.offlineRow:last-child{border:0}.offlineTour{background:#1b3025!important;color:#9ee76a!important}
+
+/* V0.9 Offline Complete */
+.offlineReady{color:#9ee76a}
+.offlineWarn{color:#f2c26d}
+.offlineBad{color:#ff9b94}
+.offlineCheck{margin-top:12px;padding:11px;border-radius:14px;background:#13231d;border:1px solid #2c4137}
+.offlineCheckTitle{display:flex;justify-content:space-between;gap:10px;font-weight:900}
+.offlineCheck small{display:block;color:var(--muted);margin-top:4px;line-height:1.4}
+.offlineProgress{height:7px;background:#24342d;border-radius:8px;overflow:hidden;margin-top:9px}
+.offlineProgress i{display:block;height:100%;background:var(--green);border-radius:8px}
+.prepareBtn{width:100%;border:0;border-radius:12px;padding:12px;background:var(--green);color:#07100b;font-weight:900;margin-top:10px}
+.testBtn{width:100%;border:1px solid #33473e;border-radius:12px;padding:11px;background:#17261f;color:white;font-weight:900;margin-top:8px}
+.poiOfflineSummary{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.poiOfflineSummary span{background:#15241e;border-radius:10px;padding:8px;font-size:10px}
+.savingOverlay{padding:15px;text-align:center}
+.savingOverlay b{display:block;font-size:18px;margin-bottom:6px}
+
+/* V1.0 Navigation */
+.navStatus{
+  margin:0 12px 10px;border:1px solid #2d463a;border-radius:16px;
+  background:#0f1d18;overflow:hidden
+}
+.navStatusTop{
+  display:flex;justify-content:space-between;align-items:end;padding:11px 12px;
+  border-bottom:1px solid var(--line)
+}
+.navStatusTop span b,.navStatusTop span small{display:block}
+.navStatusTop span small{font-size:9px;color:var(--muted);margin-top:3px}
+.navStatusTop strong{font-size:16px;color:#9ee76a}
+.navStatus.offroute{border-color:#6a302a;background:#1d1311}
+.navStatus.offroute .navStatusTop strong{color:#ff9b94}
+.nextPoint{
+  display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:11px 12px
+}
+.nextPointIcon{
+  width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#173024;font-size:20px
+}
+.nextPoint b,.nextPoint small{display:block}
+.nextPoint small{font-size:9px;color:var(--muted);margin-top:3px}
+.nextPoint>strong{font-size:14px}
+.alertBox{
+  margin:0 12px 10px;padding:10px 12px;border-radius:14px;border:1px solid #54451d;
+  background:#251f11;display:grid;grid-template-columns:34px 1fr;gap:9px;align-items:center
+}
+.alertIcon{
+  width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+  background:#57451c;color:#ffd76c;font-weight:900
+}
+.alertBox b,.alertBox small{display:block}
+.alertBox small{font-size:9px;color:#d8cda6;margin-top:2px;line-height:1.35}
+
+.liveDot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#9ee76a;margin-right:5px}
+.liveDot.off{background:#ff8e86}
+.tourOverview{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.tourMetric{background:#13231d;border-radius:12px;padding:10px}
+.tourMetric b,.tourMetric small{display:block}
+.tourMetric small{font-size:9px;color:var(--muted);margin-top:3px}
+.priorityBox{margin-top:12px;border:1px solid #2b4036;border-radius:14px;overflow:hidden}
+.priorityRow{display:flex;justify-content:space-between;padding:10px 11px;border-top:1px solid var(--line);font-size:11px}
+.priorityRow:first-child{border-top:0}
+
+/* V1.0.1 GPS quality */
+#gpsBtn{min-width:82px}
+
+/* V1.1 */
+.headerActions{display:flex;gap:8px;align-items:center}
+.warnPill{
+  border:1px solid #53441d;background:#251f11;color:#ffd76c;border-radius:999px;
+  padding:10px 12px;font-weight:900
+}
+.warnPill.active{background:#4a1f1b;color:#ffaaa4;border-color:#744039}
+.turnCard{
+  margin:0 12px 10px;padding:10px 12px;border-radius:16px;border:1px solid #2b4036;
+  background:#102019;display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center
+}
+.turnIcon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#193326;font-size:21px}
+.turnCard small,.turnCard b{display:block}.turnCard small{color:var(--muted);font-size:9px;margin-bottom:2px}
+.turnCard>strong{font-size:14px}
+.warningCenter{display:grid;gap:10px;margin-top:12px}
+.warningCard{border-radius:16px;padding:12px;border:1px solid #33443d;background:#121f1a}
+.warningCard.high{border-color:#7b332c;background:#251411}
+.warningCard.medium{border-color:#6b5424;background:#241e11}
+.warningCard.ok{border-color:#2f5138;background:#122019}
+.warningTitle{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.warningTitle b,.warningTitle small{display:block}.warningTitle small{font-size:9px;color:var(--muted);margin-top:3px}
+.warningLevel{font-size:10px;font-weight:900;padding:5px 8px;border-radius:999px;background:#243129}
+.warningCard.high .warningLevel{background:#53201b;color:#ffaaa4}
+.warningCard.medium .warningLevel{background:#4a3a18;color:#ffd76c}
+.warningCard.ok .warningLevel{background:#1d3824;color:#9ee76a}
+.warningBody{font-size:11px;line-height:1.45;color:#d4ddd9;margin-top:8px}
+.weatherGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-top:10px}
+.weatherGrid div{background:#17261f;border-radius:10px;padding:8px}
+.weatherGrid b,.weatherGrid small{display:block}.weatherGrid small{font-size:9px;color:var(--muted)}
+.refreshWarnings{width:100%;margin-top:10px;border:0;border-radius:12px;background:var(--green);color:#07100b;padding:11px;font-weight:900}
+
+.routeWarningSummary{margin:0 12px 10px;padding:10px 12px;border-radius:14px;background:#122019;border:1px solid #2d463a}
+.routeWarningSummary b,.routeWarningSummary small{display:block}
+.routeWarningSummary small{font-size:9px;color:var(--muted);margin-top:3px}
+.routeWarningSummary.alert{background:#251611;border-color:#6d352c}
+.routeWarningSummary.alert b{color:#ffaaa4}
+.routeAreaTag{display:inline-block;margin-top:7px;padding:4px 7px;border-radius:999px;background:#1b3025;color:#9ee76a;font-size:9px;font-weight:900}
+.warningRegionMatch{display:inline-block;margin-top:6px;padding:3px 6px;border-radius:999px;background:#1a2d24;color:#a7d98a;font-size:9px;font-weight:800}
+
+/* V1.3 official local WBI */
+.wbiCard{position:relative;overflow:hidden}
+.wbiScale{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:10px}
+.wbiStep{padding:7px 3px;border-radius:9px;text-align:center;font-weight:900;font-size:10px;background:#16251e;border:1px solid #2d463a;opacity:.5}
+.wbiStep.active{opacity:1;outline:2px solid rgba(255,255,255,.35);transform:translateY(-1px)}
+.wbiStep[data-level="1"]{background:#173421}
+.wbiStep[data-level="2"]{background:#29401c}
+.wbiStep[data-level="3"]{background:#51451a}
+.wbiStep[data-level="4"]{background:#5a2d18}
+.wbiStep[data-level="5"]{background:#4a1f3e}
+.wbiAdvice{margin-top:10px;padding:9px 10px;border-radius:11px;background:#14231c;font-size:10px;line-height:1.45}
+.wbiMeta{margin-top:8px;color:var(--muted);font-size:9px;line-height:1.4}
+.wbiOfficial{display:inline-block;padding:4px 7px;border-radius:999px;background:#193525;color:#9ee76a;font-weight:900;font-size:9px}
+
+/* V1.3.1 regional WBI quality */
+.wbiDistanceWarn{
+  margin-top:8px;padding:8px 10px;border-radius:10px;background:#2a2014;
+  color:#e9c78b;font-size:9px;line-height:1.4;border:1px solid #51411f
+}
+.wbiRouteSamples{
+  margin-top:8px;padding:8px 10px;border-radius:10px;background:#14231c;
+  color:#b9c8c0;font-size:9px;line-height:1.45
+}
+
+.hazardCard{margin-top:10px;border-radius:15px;padding:11px;border:1px solid #33443d;background:#121f1a}
+.hazardCard.medium{border-color:#665025;background:#231d11}.hazardCard.high{border-color:#71352e;background:#251411}
+.hazardRouteInfo{font-size:9px;color:var(--muted);margin-top:5px}.hazardDistance{font-weight:900;font-size:13px}
+.hazardSummary{margin:0 12px 10px;padding:10px 12px;border-radius:14px;background:#122019;border:1px solid #2d463a}
+.hazardSummary.alert{background:#251611;border-color:#6d352c}.hazardSummary b,.hazardSummary small{display:block}
+.hazardSummary small{font-size:9px;color:var(--muted);margin-top:3px}
+
+/* V1.5 time-aware route weather */
+.etaTag{display:inline-block;margin-top:6px;padding:4px 7px;border-radius:999px;background:#1b3025;color:#9ee76a;font-size:9px;font-weight:900}
+.hazardTime{font-size:10px;color:#d8e1dc;margin-top:4px}
+.paceGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
+.paceGrid button{border:1px solid #34483e;background:#17261f;color:#dbe5e0;border-radius:10px;padding:10px 5px;font-weight:900}
+.paceGrid button.active{background:#2a4b29;color:#9ee76a}
+.regionalFire{margin-top:10px;padding:11px;border-radius:14px;background:#1a241b;border:1px solid #384a39}
+.regionalFire b,.regionalFire small{display:block}
+.regionalFire small{font-size:9px;color:var(--muted);margin-top:4px;line-height:1.45}
+.regionalFire .rule{margin-top:8px;padding:8px 9px;border-radius:10px;background:#241c12;color:#ead1a0;font-size:10px;line-height:1.4}
+.sourceBtn{display:inline-block;margin-top:8px;border:0;border-radius:10px;padding:8px 10px;background:#1c3428;color:#9ee76a;font-weight:900;font-size:10px}
+
+/* V1.5.1 DWD geo-fix */
+.geoDebug{
+  margin-top:8px;padding:8px 10px;border-radius:10px;background:#14231c;
+  font-size:9px;color:var(--muted);line-height:1.4
+}
+.geoReject{
+  display:inline-block;margin-top:6px;padding:3px 6px;border-radius:999px;
+  background:#2b211f;color:#dca9a3;font-size:9px;font-weight:800
+}
+
+/* V1.6 regional fire-risk model */
+.fireRegionalCard{
+  margin-top:10px;padding:12px;border-radius:16px;border:1px solid #355044;background:#112019
+}
+.fireRegionalCard.medium{border-color:#6a5428;background:#231d11}
+.fireRegionalCard.high{border-color:#76372f;background:#251411}
+.fireRegionalHead{display:flex;justify-content:space-between;gap:12px;align-items:start}
+.fireRegionalHead b,.fireRegionalHead small{display:block}
+.fireRegionalHead small{font-size:9px;color:var(--muted);margin-top:3px}
+.fireRegionalLevel{padding:5px 8px;border-radius:999px;background:#1d3824;color:#9ee76a;font-size:10px;font-weight:900}
+.fireRegionalCard.medium .fireRegionalLevel{background:#4a3a18;color:#ffd76c}
+.fireRegionalCard.high .fireRegionalLevel{background:#53201b;color:#ffaaa4}
+.fireRegionalGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.fireRegionalGrid div{background:#16251f;border-radius:10px;padding:8px}
+.fireRegionalGrid b,.fireRegionalGrid small{display:block}
+.fireRegionalGrid small{font-size:9px;color:var(--muted)}
+.fireRegionalNote{margin-top:10px;padding:9px 10px;border-radius:10px;background:#17261f;font-size:10px;line-height:1.45}
+.fireRegionalSource{margin-top:8px;color:#9eb3aa;font-size:9px;line-height:1.4}
+
+/* V1.7 tour safety verdict */
+.safetyVerdict{margin:14px 0 16px;padding:18px;border:1px solid #315a47;border-radius:20px;background:#10271d}.safetyVerdict.attention{border-color:#80621e;background:#2a2110}.safetyVerdict.critical{border-color:#93463b;background:#301713}.safetyVerdictHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.safetyVerdictHead b{font-size:25px;line-height:1.15}.safetyVerdictBadge{white-space:nowrap;border-radius:999px;padding:8px 12px;font-weight:800;background:#1d4c2c;color:#9aef54}.safetyVerdict.attention .safetyVerdictBadge{background:#594511;color:#ffd85e}.safetyVerdict.critical .safetyVerdictBadge{background:#67251f;color:#ff9b91}.safetyVerdict p{margin:10px 0 0;color:#c7d0cb;line-height:1.4}.safetyFactors{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}.safetyFactor{padding:7px 10px;border-radius:999px;background:#173226;color:#b7c5bd;font-size:13px}.safetyFactor.warn{background:#493713;color:#ffd979}.safetyFactor.bad{background:#52231f;color:#ffaaa2}
+
+.safetyFactor.unknown{background:#29312e;color:#aeb8b3;border:1px solid #48534e}.timeSafety{margin:0 0 16px;padding:16px;border:1px solid #315a47;border-radius:20px;background:#0d2118}.timeSafetyHead{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:12px}.timeSafetyHead b{font-size:18px}.timeSafetyHead small,.timeHint,.timeNoData{color:#93a29a}.timeSlots{display:grid;grid-template-columns:1fr 1fr;gap:9px}.timeSlot{padding:12px;border-radius:15px;background:#153025;border:1px solid #315a47}.timeSlot.attention{background:#2a2110;border-color:#80621e}.timeSlot.critical{background:#301713;border-color:#93463b}.timeSlot b,.timeSlot strong,.timeSlot small{display:block}.timeSlot strong{margin:5px 0 3px;font-size:16px}.timeSlot small{color:#aebbb4;line-height:1.35}.timeHint{font-size:12px;line-height:1.4;margin-top:11px}.timeNoData{padding:10px 0}.safetyVerdict.good .safetyFactor.unknown{color:#c2cbc6}
+
+/* V1.9 route assistant */
+.routeForecastGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.routeForecastCard{border:1px solid #345044;background:#14231d;border-radius:14px;padding:10px}
+.routeForecastCard.medium{border-color:#6a5428;background:#241e12}
+.routeForecastCard.high{border-color:#71352e;background:#251411}
+.routeForecastCard b,.routeForecastCard small{display:block}
+.routeForecastCard small{font-size:9px;color:var(--muted);margin-top:3px}
+.routeForecastIcon{font-size:22px;margin-bottom:5px}
+.routeForecastMeta{font-size:10px;line-height:1.45;color:#cfd9d4;margin-top:7px}
+.startAdvice{margin-top:12px;padding:12px;border-radius:16px;background:#112019;border:1px solid #355044}
+.startAdvice.medium{background:#241e12;border-color:#6a5428}
+.startAdvice.high{background:#251411;border-color:#71352e}
+.startAdviceHead{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.startAdviceHead b,.startAdviceHead small{display:block}
+.startAdviceHead small{font-size:9px;color:var(--muted);margin-top:3px}
+.startBadge{padding:5px 8px;border-radius:999px;background:#1d3824;color:#9ee76a;font-weight:900;font-size:10px}
+.startAdvice.medium .startBadge{background:#4a3a18;color:#ffd76c}
+.startAdvice.high .startBadge{background:#53201b;color:#ffaaa4}
+.startReason{margin-top:10px;font-size:10px;line-height:1.45;color:#d7e0dc}
+@media(max-width:520px){.routeForecastGrid{grid-template-columns:1fr}}
+
+.plannerGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.plannerField{background:#14231d;border:1px solid #34483e;border-radius:12px;padding:10px}
+.plannerField label{display:block;font-size:9px;color:var(--muted);margin-bottom:6px}
+.plannerField input,.plannerField select{width:100%;box-sizing:border-box;background:#0f1b16;color:white;border:1px solid #33473e;border-radius:10px;padding:10px;font-size:14px}
+.planSummary{margin-top:12px;padding:12px;border-radius:15px;background:#122019;border:1px solid #2d463a}
+.planSummary b,.planSummary small{display:block}.planSummary small{font-size:9px;color:var(--muted);margin-top:4px;line-height:1.45}
+.planTimeline{display:grid;gap:8px;margin-top:10px}
+.planStop{display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:12px;background:#16251f}
+.planStopIcon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#20362a}
+.planStop b,.planStop small{display:block}.planStop small{font-size:9px;color:var(--muted);margin-top:3px}.planStop strong{font-size:13px}
+.savePlanBtn{width:100%;margin-top:12px;border:0;border-radius:12px;background:var(--green);color:#07100b;padding:12px;font-weight:900}
+.planStatus{display:inline-block;margin-top:8px;padding:4px 7px;border-radius:999px;background:#1b3025;color:#9ee76a;font-size:9px;font-weight:900}
+
+/* V2.1 map route planner */
+.mapPlanToolbar{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
+.mapPlanToolbar button{border:1px solid #34483e;background:#17261f;color:#dfe9e4;border-radius:11px;padding:10px 6px;font-weight:900;font-size:10px}
+.mapPlanToolbar button.active{background:#2b4d2c;color:#a6ef72}
+.mapPlanInfo{margin-top:10px;padding:10px;border-radius:12px;background:#14231d;border:1px solid #30463c;font-size:10px;line-height:1.45}
+.mapPlanList{display:grid;gap:8px;margin-top:12px}
+.mapPlanItem{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:12px;background:#16251f;border:1px solid #30443a}
+.mapPlanItemIcon{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#20362a}
+.mapPlanItem b,.mapPlanItem small{display:block}
+.mapPlanItem small{font-size:9px;color:var(--muted);margin-top:3px}
+.mapPlanItem button{border:0;border-radius:9px;background:#2a201d;color:#ffaaa4;padding:8px 9px;font-weight:900}
+.mapPlanSummary{margin-top:12px;padding:12px;border-radius:14px;background:#122019;border:1px solid #2d463a}
+.mapPlanSummary b,.mapPlanSummary small{display:block}
+.mapPlanSummary small{font-size:9px;color:var(--muted);margin-top:4px}
+.mapPlanSave{width:100%;margin-top:12px;border:0;border-radius:12px;background:var(--green);color:#07100b;padding:12px;font-weight:900}
+.planMarker{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,.35);font-weight:900}
+.planMarker.start{background:#2f8f4f}.planMarker.stop{background:#b58a2a}.planMarker.finish{background:#b54d3d}
+
+/* V2.1.1 planner validation */
+.mapPlanValid,.mapPlanInvalid{margin-top:12px;padding:11px 12px;border-radius:12px;font-size:10px;font-weight:800;line-height:1.4}
+.mapPlanValid{background:#173725;border:1px solid #2f7045;color:#a8ef7b}
+.mapPlanInvalid{background:#35251a;border:1px solid #795b24;color:#ffd278}
+.mapPlanSave:disabled{opacity:.38;filter:saturate(.4);cursor:not-allowed}
+.mapPlanItem.start{border-color:#3c7951}.mapPlanItem.finish{border-color:#8b4c43}.mapPlanItem.stop{border-color:#76622d}
+
+/* V2.2 stage planner */
+.stagePlanner{margin-top:12px}
+.stageCard{border:1px solid #344b40;background:#13221b;border-radius:14px;padding:11px;margin-top:8px}
+.stageCard.medium{border-color:#6b5428;background:#241e12}
+.stageCard.high{border-color:#71352e;background:#251411}
+.stageHead{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.stageHead b,.stageHead small{display:block}
+.stageHead small{font-size:9px;color:var(--muted);margin-top:3px}
+.stageDistance{font-size:13px;font-weight:900}
+.stageWeather{margin-top:9px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.stageWeather div{background:#17261f;border-radius:9px;padding:7px}
+.stageWeather b,.stageWeather small{display:block}
+.stageWeather small{font-size:8px;color:var(--muted)}
+.stopPauseRow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:8px;padding:8px 9px;border-radius:10px;background:#18271f}
+.stopPauseRow select{background:#0f1b16;color:#fff;border:1px solid #34483e;border-radius:9px;padding:8px}
+.stageTimeline{display:grid;gap:8px;margin-top:10px}
+.stageTimelineItem{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:9px;border-radius:11px;background:#16251f}
+.stageTimelineItem b,.stageTimelineItem small{display:block}
+.stageTimelineItem small{font-size:9px;color:var(--muted);margin-top:3px}
+.stageBadge{padding:4px 7px;border-radius:999px;background:#1f3827;color:#a3eb75;font-size:9px;font-weight:900}
+.stageSummary{margin-top:12px;padding:12px;border-radius:14px;background:#122019;border:1px solid #2f463c}
+.stageSummary b,.stageSummary small{display:block}
+.stageSummary small{font-size:9px;color:var(--muted);margin-top:4px;line-height:1.45}
+
+/* V2.3 live stage progress */
+.stageProgressBar{height:7px;border-radius:999px;background:#27372f;overflow:hidden;margin-top:8px}
+.stageProgressBar>span{display:block;height:100%;background:#8de239;border-radius:999px}
+.stageStats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.stageStats div{padding:8px;border-radius:10px;background:#17261f}
+.stageStats b,.stageStats small{display:block}
+.stageStats small{font-size:8px;color:var(--muted);margin-top:2px}
+.liveStage{margin-top:12px;padding:12px;border-radius:15px;background:#102019;border:1px solid #2e4d3d}
+.liveStage.warn{background:#241e12;border-color:#6a5428}
+.liveStage b,.liveStage small{display:block}
+.liveStage small{font-size:9px;color:var(--muted);margin-top:4px}
+.liveStageGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-top:10px}
+.liveStageGrid div{padding:9px;border-radius:10px;background:#17261f}
+.liveStageGrid b,.liveStageGrid small{display:block}
+.liveStageGrid small{font-size:8px;color:var(--muted)}
+.stageNowBadge{display:inline-block;margin-top:8px;padding:4px 7px;border-radius:999px;background:#1d3824;color:#9ee76a;font-size:9px;font-weight:900}
+
+/* V2.3.1 compact map tour status */
+.mapTourStatus{
+  margin:8px 12px 10px;padding:11px 12px;border-radius:14px;
+  background:#102019;border:1px solid #2f4c3d
+}
+.mapTourStatusHead{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.mapTourStatusHead b,.mapTourStatusHead small{display:block}
+.mapTourStatusHead small{font-size:9px;color:var(--muted);margin-top:3px}
+.mapTourStatusBadge{
+  padding:4px 7px;border-radius:999px;background:#1e3926;color:#9ee76a;
+  font-size:9px;font-weight:900;white-space:nowrap
+}
+.mapTourStatusGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.mapTourStatusGrid div{padding:8px;border-radius:10px;background:#17261f}
+.mapTourStatusGrid b,.mapTourStatusGrid small{display:block}
+.mapTourStatusGrid b{font-size:12px}
+.mapTourStatusGrid small{font-size:8px;color:var(--muted);margin-top:2px}
+.mapTourProgress{height:7px;background:#27372f;border-radius:999px;overflow:hidden;margin-top:9px}
+.mapTourProgress span{display:block;height:100%;background:#8de239;border-radius:999px}
+.mapTourNext{
+  margin-top:8px;padding:8px 9px;border-radius:10px;background:#17261f;
+  font-size:9px;line-height:1.4;color:#d8e3de
+}
+
+/* V2.4 live navigation */
+.mapTourStatus.v24{padding:9px 10px;margin:7px 10px 8px}
+.mapTourStatus.v24 .mapTourStatusGrid{grid-template-columns:repeat(4,1fr);gap:6px}
+.mapTourStatus.v24 .mapTourStatusGrid div{padding:7px}
+.mapTourStatus.v24 .mapTourNext{padding:7px 8px;margin-top:7px}
+.navLiveCard{
+  margin:8px 10px;padding:10px;border-radius:14px;background:#0f1f18;border:1px solid #2f4c3d
+}
+.navLiveHead{display:flex;justify-content:space-between;gap:8px;align-items:start}
+.navLiveHead b,.navLiveHead small{display:block}
+.navLiveHead small{font-size:9px;color:var(--muted);margin-top:3px}
+.navLiveBadge{padding:4px 7px;border-radius:999px;background:#1d3824;color:#9ee76a;font-size:9px;font-weight:900}
+.navLiveMain{display:grid;grid-template-columns:1.15fr .85fr;gap:8px;margin-top:9px}
+.navLiveMain>div{padding:9px;border-radius:11px;background:#17261f}
+.navLiveMain b,.navLiveMain small{display:block}
+.navLiveMain b{font-size:14px}.navLiveMain small{font-size:8px;color:var(--muted);margin-top:3px}
+.navInstruction{margin-top:8px;padding:8px 9px;border-radius:10px;background:#17261f;font-size:10px;line-height:1.4}
+.navReached{background:#193824;border-color:#3a7650}
+.navComplete{background:#1a3328;border-color:#4f8f66}
+@media(max-width:520px){
+  .mapTourStatus.v24 .mapTourStatusGrid{grid-template-columns:1fr 1fr}
+}
+
+#navStartBtn.activeNav{background:#274b31;color:#a8ef7b;border-color:#4e7c5e}
+#navStartBtn.stopNav{background:#4a2520;color:#ffb0a8;border-color:#7b4239}
+.navSessionStrip{margin-top:8px;padding:8px 9px;border-radius:10px;background:#16251f;font-size:9px;line-height:1.4}
+.navSessionStrip strong{color:#a8ef7b}
+
+/* V2.4.2 compact live strip above route POIs */
+#mapTourStatusHost:empty{display:none}
+#mapTourStatusHost .mapTourStatus.v24{margin:8px 10px 10px;padding:10px;border-radius:14px;background:#10251a;border:1px solid #39724d}
+#mapTourStatusHost .mapTourStatusHead{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+#mapTourStatusHost .mapTourStatusHead b,#mapTourStatusHost .mapTourStatusHead small{display:block}
+#mapTourStatusHost .mapTourStatusHead small{font-size:9px;color:var(--muted);margin-top:2px}
+#mapTourStatusHost .mapTourStatusBadge{padding:4px 7px;border-radius:999px;background:#1d4829;color:#a8ef7b;font-size:9px;font-weight:900}
+#mapTourStatusHost .mapTourProgress{height:5px;background:#23372d;border-radius:999px;overflow:hidden;margin:8px 0}
+#mapTourStatusHost .mapTourProgress span{display:block;height:100%;background:#8ee538;border-radius:999px}
+#mapTourStatusHost .mapTourStatusGrid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}
+#mapTourStatusHost .mapTourStatusGrid>div{background:#16271f;border-radius:9px;padding:7px}
+#mapTourStatusHost .mapTourStatusGrid b,#mapTourStatusHost .mapTourStatusGrid small{display:block}
+#mapTourStatusHost .mapTourStatusGrid b{font-size:12px}#mapTourStatusHost .mapTourStatusGrid small{font-size:7px;color:var(--muted);margin-top:2px}
+#mapTourStatusHost .mapTourNext{margin-top:7px;font-size:9px;color:#d8e2dc}
+@media(max-width:520px){#mapTourStatusHost .mapTourStatusGrid{grid-template-columns:1fr 1fr}}
+
+.routeDeviationCard{margin:8px 10px;padding:10px 11px;border-radius:13px;background:#102019;border:1px solid #2f4c3d}
+.routeDeviationCard.warn{background:#2b2011;border-color:#8a6224}
+.routeDeviationCard.danger{background:#2c1514;border-color:#9b4339}
+.routeDeviationHead{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.routeDeviationHead b,.routeDeviationHead small{display:block}
+.routeDeviationHead small{font-size:9px;color:var(--muted);margin-top:3px}
+.routeDeviationBadge{padding:4px 7px;border-radius:999px;font-size:9px;font-weight:900;background:#1d3824;color:#9ee76a}
+.routeDeviationCard.warn .routeDeviationBadge{background:#5a4317;color:#ffd46c}
+.routeDeviationCard.danger .routeDeviationBadge{background:#612a26;color:#ffaaa2}
+.routeDeviationGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.routeDeviationGrid div{background:#17261f;border-radius:9px;padding:8px}
+.routeDeviationGrid b,.routeDeviationGrid small{display:block}
+.routeDeviationGrid small{font-size:8px;color:var(--muted);margin-top:2px}
+.routeDeviationHint{margin-top:8px;font-size:9px;line-height:1.4;color:#d9e2dd}
+.routeUserMarker{width:26px;height:26px;border-radius:50%;background:#4da3ff;border:3px solid white;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+
+/* ===== V2.6 larger update ===== */
+.preRouteCard{
+  margin:8px 10px;padding:11px;border-radius:14px;
+  background:#13231c;border:1px solid #355444
+}
+.preRouteCard b,.preRouteCard small{display:block}
+.preRouteCard small{font-size:9px;color:var(--muted);margin-top:4px;line-height:1.4}
+.preRouteGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.preRouteGrid div{padding:8px;border-radius:10px;background:#17261f}
+.preRouteGrid b{font-size:13px}.preRouteGrid small{font-size:8px}
+.routeDeviationCard.arrival{background:#14261f;border-color:#3c674f}
+.elevHero{padding:14px;border-radius:16px;background:#102019;border:1px solid #345342;margin:10px 0}
+.elevStats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.elevStats div{padding:10px;border-radius:11px;background:#17261f}
+.elevStats b,.elevStats small{display:block}
+.elevStats b{font-size:16px}.elevStats small{font-size:9px;color:var(--muted);margin-top:3px}
+.elevChartWrap{margin-top:12px;padding:10px;border-radius:13px;background:#0c1813;border:1px solid #2d4438;overflow:hidden}
+.elevChart{width:100%;height:180px;display:block}
+.elevLegend{display:flex;justify-content:space-between;gap:8px;margin-top:6px;font-size:9px;color:var(--muted)}
+.gradeTag{display:inline-flex;align-items:center;padding:4px 7px;border-radius:999px;font-size:9px;font-weight:900}
+.gradeEasy{background:#1d3824;color:#9ee76a}
+.gradeMedium{background:#4b3d16;color:#ffd46c}
+.gradeHard{background:#53231e;color:#ffaaa2}
+.stageElevation{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:7px}
+.stageElevation div{padding:7px;border-radius:9px;background:#182820}
+.stageElevation b,.stageElevation small{display:block}
+.stageElevation small{font-size:8px;color:var(--muted)}
+.tourCheckHero{padding:14px;border-radius:16px;background:#102019;border:1px solid #355444}
+.tourCheckScore{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.tourCheckScore strong{font-size:31px}
+.tourCheckCards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+.tourCheckCards div{padding:10px;border-radius:11px;background:#17261f}
+.tourCheckCards b,.tourCheckCards small{display:block}
+.tourCheckCards small{font-size:8px;color:var(--muted);margin-top:3px}
+.tourCheckSection{margin-top:12px;padding:11px;border-radius:13px;background:#122019;border:1px solid #2e463a}
+.tourCheckSection h3{margin:0 0 7px;font-size:14px}
+.tourCheckSection p{margin:0;color:#cad5cf;font-size:10px;line-height:1.45}
+.profileMissing{padding:12px;border-radius:12px;background:#2b2011;border:1px solid #6f5527;color:#f1d397;font-size:10px;line-height:1.5}
+
+/* ===== V2.6.1 arrival mode + pack/supply check ===== */
+.arrivalModeCard{
+  margin:8px 10px;padding:12px;border-radius:14px;
+  background:#16231d;border:1px solid #3c5849
+}
+.arrivalModeHead{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.arrivalModeHead b,.arrivalModeHead small{display:block}
+.arrivalModeHead small{font-size:9px;color:var(--muted);margin-top:4px;line-height:1.4}
+.arrivalModeBadge{padding:4px 8px;border-radius:999px;background:#21382c;color:#a9eb7c;font-size:9px;font-weight:900;white-space:nowrap}
+.arrivalModeGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.arrivalModeGrid div{padding:9px;border-radius:10px;background:#17261f}
+.arrivalModeGrid b,.arrivalModeGrid small{display:block}
+.arrivalModeGrid b{font-size:13px}
+.arrivalModeGrid small{font-size:8px;color:var(--muted);margin-top:2px}
+.arrivalModeHint{margin-top:9px;padding:8px 9px;border-radius:10px;background:#0f1c17;font-size:9px;line-height:1.45;color:#d7e1dc}
+.supplyHero{padding:12px;border-radius:14px;background:#102019;border:1px solid #355444;margin-top:12px}
+.supplyScore{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.supplyScore strong{font-size:30px}
+.supplyGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.supplyGrid div{padding:10px;border-radius:11px;background:#17261f}
+.supplyGrid b,.supplyGrid small{display:block}
+.supplyGrid small{font-size:8px;color:var(--muted);margin-top:3px}
+.supplyAdvice{margin-top:9px;padding:10px;border-radius:11px;background:#14231c;font-size:10px;line-height:1.45}
+.supplyAdvice.warn{background:#2b2112;border:1px solid #765820}
+.supplyAdvice.good{background:#17301f;border:1px solid #365f43}
+
+/* ===== V2.6.3 centralized navigation state ===== */
+.navStateCard{
+  margin:8px 10px;padding:12px;border-radius:14px;
+  background:#14231d;border:1px solid #365243
+}
+.navStateHead{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.navStateHead b,.navStateHead small{display:block}
+.navStateHead small{font-size:9px;color:var(--muted);margin-top:4px;line-height:1.4}
+.navStateBadge{padding:4px 8px;border-radius:999px;background:#20382c;color:#a7ea79;font-size:9px;font-weight:900;white-space:nowrap}
+.navStateGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.navStateGrid div{padding:9px;border-radius:10px;background:#17261f}
+.navStateGrid b,.navStateGrid small{display:block}
+.navStateGrid small{font-size:8px;color:var(--muted);margin-top:3px}

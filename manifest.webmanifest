@@ -1,0 +1,9 @@
+{
+  "name": "Trek & Sleep V2.7",
+  "short_name": "Trek & Sleep",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#07120e",
+  "theme_color": "#07120e",
+  "description": "Bereinigte Basis mit einheitlicher Distanzberechnung und zentraler GPS-Navigation."
+}
