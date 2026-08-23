@@ -153,7 +153,12 @@ function info(title,text){
 
 function setRoute(points,name,save=true,elevations=null){
  route=points;
- routeEle=Array.isArray(elevations)&&elevations.length===points.length?elevations.map(v=>Number.isFinite(Number(v))?Number(v):null):new Array(points.length).fill(null);
+ routeEle=Array.isArray(elevations)&&elevations.length===points.length?normalizeElevationArray(elevations):new Array(points.length).fill(null);
+ if(usableElevationData(routeEle)){
+   if(elevationDataSource==='none')elevationDataSource='gpx';
+ }else{
+   elevationDataSource='none';
+ }
  routeGeoContext={names:[],state:'',county:'',city:'',resolved:false,error:false};
  routeCum=[0];
  for(let i=1;i<route.length;i++) routeCum[i]=routeCum[i-1]+hav(route[i-1],route[i]);
@@ -299,7 +304,7 @@ function locate(){
 }
 
 
-/* ===== V2.8 runtime-safe GPS/navigation helpers ===== */
+/* ===== V2.9 runtime-safe GPS/navigation helpers ===== */
 function finiteNumber(v){
  const n=Number(v);
  return Number.isFinite(n)?n:null;
@@ -1288,7 +1293,7 @@ function mapPlanListHtml(){
  }).join('')}</div>`;
 }
 function openMapPlanner(){
- $('#modalBody').innerHTML=`<span class="tag">📍 Kartenplanung · V2.8</span>
+ $('#modalBody').innerHTML=`<span class="tag">📍 Kartenplanung · V2.9</span>
  <h2>Start, Stopps und Ziel</h2>
  <div class="mapPlanInfo">Wähle unten einen Punkttyp, schließe das Fenster und tippe auf die Karte. Der Punkt rastet auf die vorhandene GPX-Route ein.</div>
  <div class="mapPlanToolbar">
@@ -1502,7 +1507,7 @@ function startNavigationSession(){
  }
  navigationSession={active:true,startedAt:new Date().toISOString()};
  navigationModeState={mode:'gps_pending',distanceToStartKm:null,lastStableAt:Date.now(),lastGpsAt:0};
- // V2.8 starts in Vor-Tour mode until GPS is close enough to the planned start.
+ // V2.9 starts in Vor-Tour mode until GPS is close enough to the planned start.
  liveNavState={activeStageIndex:0,reachedStops:{},completed:false};
  saveNavigationSession();setNavigationButton();renderMapTourStatus();
 }
@@ -1818,8 +1823,153 @@ function stagePlannerHtml(stages){
 }
 
 
+
+/* ===== V2.9: echtes Höhenprofil ===== */
+const V29_ELEV_CACHE='trek_sleep_v29_elevation_cache';
+let elevationDataSource='none';
+
+function normalizeElevationArray(arr){
+ if(!Array.isArray(arr))return [];
+ const out=arr.map(v=>Number.isFinite(Number(v))?Number(v):null);
+ let lastGood=-1;
+ for(let i=0;i<out.length;i++){
+   if(out[i]!=null){lastGood=i;continue}
+   let next=i+1;
+   while(next<out.length && out[next]==null)next++;
+   if(lastGood>=0 && next<out.length){
+     const a=out[lastGood],b=out[next],span=next-lastGood;
+     for(let k=i;k<next;k++)out[k]=a+(b-a)*((k-lastGood)/span);
+     i=next-1;
+   }else if(lastGood>=0){
+     out[i]=out[lastGood];
+   }else if(next<out.length){
+     out[i]=out[next];
+   }
+ }
+ return out;
+}
+
+function usableElevationData(arr=routeEle){
+ if(!Array.isArray(arr) || arr.length!==route.length || arr.length<2)return false;
+ const vals=arr.filter(v=>Number.isFinite(Number(v))).map(Number);
+ if(vals.length<Math.max(3,Math.floor(arr.length*.6)))return false;
+ const min=Math.min(...vals),max=Math.max(...vals);
+ // all-zero / flat placeholder data must not count as valid
+ return Number.isFinite(min)&&Number.isFinite(max)&&(max-min>=2 || max>20);
+}
+
+function elevationCacheKey(){
+ if(!route?.length)return null;
+ const pts=[route[0],route[Math.floor(route.length/2)],route.at(-1)]
+   .flat().map(v=>Number(v).toFixed(4)).join('|');
+ return `${route.length}|${pts}`;
+}
+
+function loadElevationCache(){
+ try{
+   const key=elevationCacheKey(); if(!key)return false;
+   const all=JSON.parse(localStorage.getItem(V29_ELEV_CACHE)||'{}');
+   const hit=all[key];
+   if(hit?.values && hit.values.length===route.length && usableElevationData(hit.values)){
+     routeEle=normalizeElevationArray(hit.values);
+     elevationDataSource='cache';
+     return true;
+   }
+ }catch(e){}
+ return false;
+}
+
+function saveElevationCache(){
+ try{
+   if(!usableElevationData(routeEle))return;
+   const key=elevationCacheKey(); if(!key)return;
+   const all=JSON.parse(localStorage.getItem(V29_ELEV_CACHE)||'{}');
+   all[key]={values:routeEle,ts:Date.now()};
+   const latest=Object.entries(all)
+     .sort((a,b)=>(b[1]?.ts||0)-(a[1]?.ts||0))
+     .slice(0,8);
+   localStorage.setItem(V29_ELEV_CACHE,JSON.stringify(Object.fromEntries(latest)));
+ }catch(e){}
+}
+
+function sampleRouteForElevation(maxPoints=100){
+ if(route.length<=maxPoints)return route.map((p,i)=>({lat:Number(p[0]),lon:Number(p[1]),idx:i}));
+ const out=[];
+ for(let n=0;n<maxPoints;n++){
+   const idx=Math.round((route.length-1)*(n/(maxPoints-1)));
+   const p=route[idx];
+   out.push({lat:Number(p[0]),lon:Number(p[1]),idx});
+ }
+ return out;
+}
+
+function expandElevationSamples(samples,vals){
+ const out=new Array(route.length).fill(null);
+ samples.forEach((s,i)=>{out[s.idx]=Number(vals[i])});
+ for(let j=0;j<samples.length-1;j++){
+   const a=samples[j],b=samples[j+1];
+   const ea=Number(vals[j]),eb=Number(vals[j+1]);
+   if(!Number.isFinite(ea)||!Number.isFinite(eb))continue;
+   const span=Math.max(1,b.idx-a.idx);
+   for(let i=a.idx;i<=b.idx;i++)out[i]=ea+(eb-ea)*((i-a.idx)/span);
+ }
+ return normalizeElevationArray(out);
+}
+
+async function fetchRouteElevations(){
+ const samples=sampleRouteForElevation(100);
+ if(!samples.length)throw Error('Keine Route');
+ const lat=samples.map(p=>p.lat.toFixed(5)).join(',');
+ const lon=samples.map(p=>p.lon.toFixed(5)).join(',');
+ const url=`https://api.open-meteo.com/v1/elevation?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}`;
+ const res=await fetchWithTimeout(url,{},18000);
+ if(!res.ok)throw Error(`Höhenservice HTTP ${res.status}`);
+ const data=await res.json();
+ if(!Array.isArray(data?.elevation)||data.elevation.length!==samples.length)throw Error('Unvollständige Höhendaten');
+ const expanded=expandElevationSamples(samples,data.elevation);
+ if(!usableElevationData(expanded))throw Error('Unbrauchbare Höhendaten');
+ return expanded;
+}
+
+async function ensureElevationData(force=false){
+ if(!route?.length)return false;
+
+ if(!force && usableElevationData(routeEle)){
+   routeEle=normalizeElevationArray(routeEle);
+   elevationDataSource=elevationDataSource==='cache'?'cache':'gpx';
+   return true;
+ }
+ if(!force && loadElevationCache())return true;
+ if(!navigator.onLine)return false;
+
+ try{
+   routeEle=await fetchRouteElevations();
+   elevationDataSource='online';
+   saveElevationCache();
+   try{
+     localStorage.setItem('trek_sleep_last_route',JSON.stringify({
+       name:$('#routeName')?.textContent||'Tour',
+       points:route,
+       elevations:routeEle,
+       ts:Date.now()
+     }));
+   }catch(e){}
+   return true;
+ }catch(e){
+   console.warn('V2.9 Höhenprofil:',e);
+   return false;
+ }
+}
+
+function elevationSourceLabel(){
+ if(elevationDataSource==='gpx')return 'GPX-Höhendaten';
+ if(elevationDataSource==='online')return 'Höhendaten nachgeladen';
+ if(elevationDataSource==='cache')return 'gespeicherte Höhendaten';
+ return 'keine Höhendaten';
+}
+
 function hasElevationData(){
- return routeEle.length===route.length && routeEle.filter(v=>Number.isFinite(v)).length>=Math.max(3,route.length*0.6);
+ return usableElevationData(routeEle);
 }
 function interpolateElevationAtKm(km){
  if(!hasElevationData() || !routeCum.length)return null;
@@ -1895,17 +2045,35 @@ function stageElevationHtml(){
    </div>`;
  }).join('');
 }
-function openElevationProfile(){
+async function openElevationProfile(){
+ $('#modalBody').innerHTML=`<span class="tag">⛰ Höhenprofil · V2.9</span><h2>Höhenprofil</h2>
+ <div class="profileMissing">Höhendaten werden geprüft …</div>`;
+ $('#modal').classList.remove('hidden');
+
+ const ready=await ensureElevationData(false);
  const diff=routeDifficulty();
- if(!hasElevationData()){
-   $('#modalBody').innerHTML=`<span class="tag">⛰ Höhenprofil · V2.8</span><h2>Höhenprofil</h2>
-   <div class="profileMissing">Diese GPX-Datei enthält keine ausreichenden Höhenwerte. Importiere eine GPX-Datei mit &lt;ele&gt;-Daten, dann berechnet Trek & Sleep Aufstieg, Abstieg, höchste Punkte und Etappenprofile automatisch.</div>`;
-   $('#modal').classList.remove('hidden');return;
+
+ if(!ready || !hasElevationData()){
+   $('#modalBody').innerHTML=`<span class="tag">⛰ Höhenprofil · V2.9</span><h2>Höhenprofil</h2>
+   <div class="profileMissing">
+     Diese GPX-Datei enthält keine ausreichenden Höhenwerte und es konnten gerade keine Höhendaten nachgeladen werden.
+     ${navigator.onLine?'Du kannst die Abfrage erneut versuchen.':'Du bist aktuell offline.'}
+   </div>
+   <button id="retryElevationV29" class="primary wide">Höhendaten erneut laden</button>`;
+   $('#retryElevationV29').onclick=async()=>{
+     const ok=await ensureElevationData(true);
+     if(ok)openElevationProfile();
+     else alert('Höhendaten konnten nicht geladen werden.');
+   };
+   return;
  }
+
  const m=mapPlanMetrics();
  const st=elevationStatsBetween(m.valid?m.startP.alongKm:0,m.valid?m.finishP.alongKm:null);
- $('#modalBody').innerHTML=`<span class="tag">⛰ Höhenprofil · V2.8</span><h2>Tourprofil</h2>
+
+ $('#modalBody').innerHTML=`<span class="tag">⛰ Höhenprofil · V2.9</span><h2>Tourprofil</h2>
  <div class="elevHero">
+   <div class="pills"><span class="pill ok">${escapeHtml(elevationSourceLabel())}</span></div>
    <span class="gradeTag ${diff.cls}">${diff.label}</span>
    <div class="elevStats">
      <div><b>+${st.gain} m</b><small>Aufstieg</small></div>
@@ -1915,8 +2083,14 @@ function openElevationProfile(){
    </div>
    <div class="elevChartWrap">${elevationSvg()}<div class="elevLegend"><span>Start</span><span>${(m.valid?m.distance:(routeCum.at(-1)||0)).toFixed(1)} km</span><span>Ziel</span></div></div>
  </div>
- ${stageElevationHtml()}`;
- $('#modal').classList.remove('hidden');
+ ${stageElevationHtml()}
+ <button id="reloadElevationV29" class="primary wide">Höhendaten neu laden</button>`;
+
+ $('#reloadElevationV29').onclick=async()=>{
+   const ok=await ensureElevationData(true);
+   if(ok)openElevationProfile();
+   else alert('Höhendaten konnten nicht neu geladen werden.');
+ };
 }
 
 function poiCategoryCount(type){
@@ -1988,7 +2162,7 @@ function tourCheckData(){
 }
 function openTourOverview(){
  const d=tourCheckData();
- $('#modalBody').innerHTML=`<span class="tag">🧭 Tour-Check · V2.8</span><h2>Tour-Zusammenfassung</h2>
+ $('#modalBody').innerHTML=`<span class="tag">🧭 Tour-Check · V2.9</span><h2>Tour-Zusammenfassung</h2>
  <div class="tourCheckHero">
    <div class="tourCheckScore"><div><b>Vorbereitung</b><small>${d.readiness>=85?'sehr gut':d.readiness>=70?'gut':'noch ergänzen'}</small></div><strong>${d.readiness}%</strong></div>
    <div class="tourCheckCards">
@@ -2410,15 +2584,28 @@ function importGPX(e){
  rd.onload=()=>{
    try{
      const xml=new DOMParser().parseFromString(rd.result,'text/xml');
-     const rawPts=[...xml.querySelectorAll('trkpt')].map(n=>({
-       p:[+n.getAttribute('lat'),+n.getAttribute('lon')],
+     if(xml.querySelector('parsererror'))throw Error('GPX-Datei konnte nicht gelesen werden');
+     let nodes=[...xml.querySelectorAll('trkpt')];
+     if(nodes.length<2)nodes=[...xml.querySelectorAll('rtept')];
+     const rawPts=nodes.map(n=>({
+       p:[Number(n.getAttribute('lat')),Number(n.getAttribute('lon'))],
        ele:n.querySelector('ele')?Number(n.querySelector('ele').textContent):null
-     })).filter(x=>isFinite(x.p[0])&&isFinite(x.p[1]));
+     })).filter(x=>Number.isFinite(x.p[0])&&Number.isFinite(x.p[1]));
+
      if(rawPts.length<2)throw Error('Keine Trackpunkte gefunden');
      const step=Math.max(1,Math.floor(rawPts.length/2200));
      const sampled=rawPts.filter((_,i)=>i%step===0 || i===rawPts.length-1);
-     setRoute(sampled.map(x=>x.p),f.name.replace(/\.gpx$/i,''),true,sampled.map(x=>x.ele));
+     const elevations=normalizeElevationArray(sampled.map(x=>x.ele));
+     elevationDataSource=usableElevationData(elevations)?'gpx':'none';
+
+     setRoute(sampled.map(x=>x.p),f.name.replace(/\.gpx$/i,''),true,elevations);
      $('#poiState').textContent='GPX gespeichert · POIs neu laden';
+
+     if(!usableElevationData(routeEle)){
+       ensureElevationData(false).then(ok=>{
+         if(ok)$('#routeMeta').textContent=`${routeCum.at(-1).toFixed(1)} km · Höhenprofil verfügbar`;
+       });
+     }
    }catch(err){
      alert('GPX-Fehler: '+err.message);
    }
@@ -2693,7 +2880,7 @@ function saveTours(x){
 
 async function saveCurrentTour(){
  if(!route.length)return;
- $('#modalBody').innerHTML=`<div class="savingOverlay"><span class="tag">📥 Offline · V2.8</span><h2>Tour wird vorbereitet</h2><b>POIs werden automatisch gesichert …</b><span class="muted">Du musst „POIs laden“ vorher nicht mehr antippen.</span></div>`;
+ $('#modalBody').innerHTML=`<div class="savingOverlay"><span class="tag">📥 Offline · V2.9</span><h2>Tour wird vorbereitet</h2><b>POIs werden automatisch gesichert …</b><span class="muted">Du musst „POIs laden“ vorher nicht mehr antippen.</span></div>`;
  $('#modal').classList.remove('hidden');
 
  let offlinePois=[];
@@ -2728,7 +2915,7 @@ async function saveCurrentTour(){
  $('#saveTourBtn').textContent='♥';
 
  const pct=offlinePois.length?100:75;
- $('#modalBody').innerHTML=`<span class="tag">✓ Offline gespeichert · V2.8</span>
+ $('#modalBody').innerHTML=`<span class="tag">✓ Offline gespeichert · V2.9</span>
  <h2>${escapeHtml(name)}</h2>
  <div class="offlineCheck">
    <div class="offlineCheckTitle"><span>Offline-Bereitschaft</span><strong class="${offlinePois.length?'offlineReady':'offlineWarn'}">${pct}%</strong></div>
@@ -2743,12 +2930,12 @@ async function saveCurrentTour(){
    <span>✚ Rettung <b>${stats.emergency}</b></span>
    <span>⚖ Recht <b>${stats.legal}</b></span>
  </div>
- <div class="warning">Kartenkacheln bleiben weiterhin ausgenommen. V2.8 speichert Route, POIs, Rechtsdaten und App-Oberfläche offline.</div>`;
+ <div class="warning">Kartenkacheln bleiben weiterhin ausgenommen. V2.9 speichert Route, POIs, Rechtsdaten und App-Oberfläche offline.</div>`;
 }
 
 function openTourLibrary(){
  const tours=savedTours();
- $('#modalBody').innerHTML=`<span class="tag">↗ Touren · V2.8</span><h2>Meine Touren</h2>
+ $('#modalBody').innerHTML=`<span class="tag">↗ Touren · V2.9</span><h2>Meine Touren</h2>
  ${tours.length?tours.map(t=>{
    const ready=(t.points?.length&&t.pois?.length)?'✓ Offline bereit':'◐ Offline teilweise';
    const cls=(t.points?.length&&t.pois?.length)?'offlineBadge':'offlineBadge partial';
@@ -2846,7 +3033,7 @@ function openOfflineManager(id){
  const pct=Math.round((passed/4)*100);
  const stats=t.poiStats||poiStats(t.pois||[]);
 
- $('#modalBody').innerHTML=`<span class="tag">📥 Offline · V2.8</span>
+ $('#modalBody').innerHTML=`<span class="tag">📥 Offline · V2.9</span>
  <h2>${escapeHtml(t.name)}</h2>
 
  <div class="offlineCheck">
@@ -2875,7 +3062,7 @@ function openOfflineManager(id){
  <button id="prepareOffline" class="prepareBtn">Offline-Daten aktualisieren</button>
  <button id="testOffline" class="testBtn">Gespeicherte Daten testen</button>
 
- <div class="warning">V2.8 speichert POIs jetzt automatisch mit der Tour. Die eigentliche Kartenfläche benötigt für einen vollständigen Offline-Modus später eine Kartenquelle, die Offline-Pakete ausdrücklich erlaubt.</div>`;
+ <div class="warning">V2.9 speichert POIs jetzt automatisch mit der Tour. Die eigentliche Kartenfläche benötigt für einen vollständigen Offline-Modus später eine Kartenquelle, die Offline-Pakete ausdrücklich erlaubt.</div>`;
 
  $('#modal').classList.remove('hidden');
 
@@ -2909,7 +3096,7 @@ function setSheet(mode){
 
 function openNavigationSettings(){
  $('#modalBody').innerHTML=`
- <span class="tag">🧭 Navigation · V2.8</span>
+ <span class="tag">🧭 Navigation · V2.9</span>
  <h2>Tourführung</h2>
  <div class="priorityBox">
    <div class="priorityRow"><span>Warnung „Route verlassen“</span><b>${NAV_PREFS.offRouteWarnM} m</b></div>
@@ -2917,13 +3104,13 @@ function openNavigationSettings(){
    <div class="priorityRow"><span>Schlafplatz-Hinweis</span><b>${NAV_PREFS.sleepWarnKm} km</b></div>
    <div class="priorityRow"><span>Wichtige Punkte voraus</span><b>${NAV_PREFS.importantWithinKm} km</b></div>
  </div>
- <div class="warning">V2.8 bietet GPS-basierte Tourführung und Warnungen, aber noch keine sprachgeführte Abbiege-Navigation. Sie folgt weiterhin dem importierten GPX-Track.</div>`;
+ <div class="warning">V2.9 bietet GPS-basierte Tourführung und Warnungen, aber noch keine sprachgeführte Abbiege-Navigation. Sie folgt weiterhin dem importierten GPX-Track.</div>`;
  $('#modal').classList.remove('hidden');
 }
 
 function openLegalOverview(){
  $('#modalBody').innerHTML=`
- <span class="tag">⚖ Rechts-Layer · V2.8</span>
+ <span class="tag">⚖ Rechts-Layer · V2.9</span>
  <h2>Pfälzerwald</h2>
  <div class="zoneBadge">Rheinland-Pfalz · Quellenstand 22.08.2026</div>
  <div class="legalBox">
@@ -2940,7 +3127,7 @@ function openLegalOverview(){
 }
 
 
-/* ===== V2.8 Tour-Cockpit / Anreise / Backup / Werkzeuge ===== */
+/* ===== V2.9 Tour-Cockpit / Anreise / Backup / Werkzeuge ===== */
 
 function v28RouteName(){
  return $('#routeName')?.textContent || 'Tour';
@@ -2992,7 +3179,7 @@ function openTourCockpit(){
  const distStart=navigationSession.active?distanceToTourStartKm():null;
 
  $('#modalBody').innerHTML=`
- <span class="tag">🎛 Tour-Cockpit · V2.8</span>
+ <span class="tag">🎛 Tour-Cockpit · V2.9</span>
  <h2>${escapeHtml(v28RouteName())}</h2>
 
  <div class="cockpitHero">
@@ -3125,7 +3312,7 @@ function openV28Tools(message=''){
  const net=v28NetworkStatus();
  const backups=Object.keys(v28BackupPayload().storage).length;
  $('#modalBody').innerHTML=`
- <span class="tag">🧰 Werkzeuge · V2.8</span>
+ <span class="tag">🧰 Werkzeuge · V2.9</span>
  <h2>App & Route</h2>
  ${message?`<div class="backupStatus">${escapeHtml(message)}</div>`:''}
  <div class="toolCard">

@@ -650,3 +650,9 @@ nav .active{color:var(--green)}
 .toolCard b,.toolCard small{display:block}
 .toolCard small{color:var(--muted);margin:4px 0 10px;line-height:1.45}
 .backupStatus{border:1px solid #365343;border-radius:13px;padding:11px;margin:10px 0;color:#c7d0cb;background:#14241d}
+
+/* ===== V2.9 Höhenprofil ===== */
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 10px}
+.pill{display:inline-flex;padding:5px 9px;border-radius:999px;background:#26312b;color:#cad4ce;font-weight:800;font-size:12px}
+.pill.ok{background:#193923;color:#9bea69}
+.wide{width:100%;margin-top:12px}

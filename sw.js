@@ -1,5 +1,5 @@
-const SHELL='trek-sleep-v28';
-const RUNTIME='trek-sleep-v28-16-runtime';
+const SHELL='trek-sleep-v29';
+const RUNTIME='trek-sleep-v29-16-runtime';
 const ASSETS=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest'];
 
 self.addEventListener('install',event=>{
