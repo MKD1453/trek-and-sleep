@@ -675,3 +675,35 @@ nav .active{color:var(--green)}
 .offlineItem{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #294136}.offlineItem:last-child{border-bottom:0}.offlineItem small{color:var(--muted)}
 .navHintBar{position:absolute;left:14px;right:14px;top:12px;z-index:700;background:rgba(8,24,18,.94);border:1px solid #3a5a49;border-radius:16px;padding:11px 13px;display:none;grid-template-columns:46px 1fr auto;gap:10px;align-items:center;backdrop-filter:blur(10px)}
 .navHintBar.show{display:grid}.navHintBar .ico{font-size:28px;text-align:center}.navHintBar b,.navHintBar small{display:block}.navHintBar small{color:#a9b6b0;margin-top:2px}.navHintBar strong{color:#9bea69}
+
+/* ===== Trek & Sleep V3.1 ===== */
+.navAssistCard{
+  margin:8px 10px;padding:12px;border-radius:15px;background:#102019;border:1px solid #355444
+}
+.navAssistCard.warn{background:#2a2112;border-color:#7a5a24}
+.navAssistCard.danger{background:#2d1715;border-color:#91473e}
+.navAssistHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.navAssistHead b,.navAssistHead small{display:block}
+.navAssistHead small{color:var(--muted);font-size:9px;margin-top:3px;line-height:1.4}
+.navAssistBadge{padding:4px 8px;border-radius:999px;background:#1e3a27;color:#9bea69;font-weight:900;font-size:9px;white-space:nowrap}
+.navAssistCard.warn .navAssistBadge{background:#5b431a;color:#ffd46e}
+.navAssistCard.danger .navAssistBadge{background:#632b28;color:#ffaaa2}
+.navAssistGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+.navAssistGrid div{padding:9px;border-radius:10px;background:#17261f}
+.navAssistGrid b,.navAssistGrid small{display:block}
+.navAssistGrid b{font-size:14px}.navAssistGrid small{font-size:8px;color:var(--muted);margin-top:2px}
+.navAssistHint{margin-top:9px;padding:9px;border-radius:10px;background:#17261f;font-size:10px;line-height:1.45}
+.navAssistSettings{display:grid;gap:10px;margin-top:12px}
+.navAssistSetting{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:11px;border-radius:12px;background:#15251e}
+.navAssistSetting b,.navAssistSetting small{display:block}.navAssistSetting small{font-size:9px;color:var(--muted);margin-top:3px}
+.navAssistSetting input[type="checkbox"]{width:22px;height:22px}
+.navAssistSetting select{background:#0f1b16;color:#fff;border:1px solid #3a5045;border-radius:9px;padding:8px}
+.liveNavStrip{
+  margin:8px 10px;padding:10px 11px;border-radius:14px;background:#0f2119;border:1px solid #355444
+}
+.liveNavStripTop{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.liveNavStripTop b,.liveNavStripTop small{display:block}
+.liveNavStripTop small{font-size:9px;color:var(--muted);margin-top:2px}
+.liveNavStrip strong{color:#9bea69;font-size:14px}
+.liveNavStripProgress{height:8px;background:#21352c;border-radius:999px;overflow:hidden;margin-top:8px}
+.liveNavStripProgress span{display:block;height:100%;background:#8ee53e}

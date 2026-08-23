@@ -1,9 +1,9 @@
 {
-  "name": "Trek & Sleep V3.0",
+  "name": "Trek & Sleep V3.1",
   "short_name": "Trek & Sleep",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#07120e",
   "theme_color": "#07120e",
-  "description": "Trekking-App mit Trail-Abbiegehinweisen, Etappenplan, Offline-Tourpaketen, Höhenprofil, GPS-Navigation, POIs und Sicherheitscenter."
+  "description": "Trekking-App mit Navigationsassistenz, Abbiege- und Stoppwarnungen, Routenabweichungs-Rückkehrhilfe, Trail-Navigation, Etappenplan, Offline-Touren und Höhenprofil."
 }

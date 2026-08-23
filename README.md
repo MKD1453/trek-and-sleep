@@ -1,19 +1,26 @@
-# Trek & Sleep V3.0
+# Trek & Sleep V3.1
 
-## Neu in V3.0
-- Trail-Navigation mit geometrischen Richtungs- und Abbiegehinweisen aus der GPX-Linie.
-- Etappen-/Tagesplan mit Distanz, ETA, Pausen, Höhenmetern und wichtigen POIs.
-- Offline-Tourpaket für GPX-Route, Planung, POIs, Höhenprofil und Kern-App-Dateien.
-- Schnellzugriffe auf Trail, Etappen und Offline-Tour aus dem Tour-Cockpit.
+## Neuer Navigationsassistent
+- Abbiegewarnungen vor markanten GPX-Richtungsänderungen
+- Warnung vor geplantem Zwischenstopp/Ziel
+- Warnung bei Routenabweichung
+- Rückkehrhinweis zur GPX-Linie mit grober Himmelsrichtung
+- akustische Signale über Web Audio
+- Vibration auf unterstützten Geräten
+- einstellbare Warnabstände
+- kompakte Live-Navigationsleiste mit Reststrecke und Fortschritt
+
+## Bewusst
+- Warnungen sind nur im echten Live-Modus aktiv.
+- Im Vor-Tour-/Anreisemodus gibt es keine Abbiege- oder Routenabweichungswarnungen.
+- iOS/Safari kann Vibration je nach Browser-/PWA-Modus einschränken; Ton funktioniert erst nach einer Nutzerinteraktion.
 
 ## Weiter enthalten
-- echtes Höhenprofil aus V2.9
-- Apple-Maps-Anreise zum Tourstart
-- Vor-Tour- und Live-GPS-Navigation
-- POIs, Warncenter, Rechts-Layer, Backup/Wiederherstellung
-
-Hinweis: Eine vollständig garantierte Offline-Karte mit sämtlichen OSM-Kacheln ist in der
-aktuellen Web-App nicht zuverlässig möglich. V3.0 speichert deshalb die eigentlichen Tourdaten
-vollständig und hält die Kern-App-Dateien im Browsercache bereit.
+- V3.0 Trail-Navigation
+- Etappen-/Tagesplan
+- Offline-Tourpaket
+- V2.9 Höhenprofil
+- Apple-Maps-Anreise
+- Tour-Cockpit, Backup, Warncenter, Rechts-Layer und POIs
 
 Für GitHub Pages die sechs Dateien im bestehenden Repository ersetzen und committen.
