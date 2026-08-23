@@ -1,16 +1,25 @@
-# Trek & Sleep V3.1.1
+# Trek & Sleep V3.2
 
-## Fix gegenüber V3.1
-Die Abbiegeleiste aus V3.0/V3.1 wird jetzt strikt unterdrückt, solange die App im
-Vor-Tour-/Anreisemodus ist.
+## GPS-gesteuerte Live-Navigation
+- nächster Abbiegehinweis wird aus der echten GPS-Position auf der GPX-Linie bestimmt
+- Entfernung zum Manöver zählt live herunter
+- nach dem Passieren wird automatisch auf den nächsten Hinweis gewechselt
+- optionaler zweiter Hinweis als Vorschau
+- Reststrecke, Fortschritt und GPS-Genauigkeit direkt im Live-HUD
+- bei Routenabweichung wird der Abbiegehinweis durch eine Rückkehranzeige ersetzt
+- grobe Rückkehrrichtung zur GPX-Linie
+- optionale deutsche Sprachansagen
+- Ton und Vibration aus V3.1.1 bleiben erhalten
 
-Ein Hinweis wie „Rechts abbiegen – 25 m“ darf erst erscheinen, wenn:
-- die Navigation wirklich aktiv ist,
-- der Live-Modus aktiv ist,
-- eine gültige GPS-Position vorliegt,
-- eine belastbare Zuordnung zur GPX-Route möglich ist,
-- und der nächste Richtungswechsel nah genug ist.
+## Vor-Tour-Schutz
+Alle Live-Hinweise bleiben im Anreise-/Vor-Tour-Modus deaktiviert.
 
-Zusätzlich wird die Leiste beim Rendern des Vor-Tour-Status sofort ausgeblendet.
+## Weiter enthalten
+- Trail-Navigation
+- Etappen-/Tagesplan
+- Offline-Tourpaket
+- Höhenprofil
+- Apple-Maps-Anreise
+- Tour-Cockpit, Warncenter, Rechts-Layer, POIs, Backup
 
-Alle Funktionen aus V3.1 bleiben erhalten.
+Für GitHub Pages wieder die sechs Dateien im bestehenden Repository ersetzen und committen.

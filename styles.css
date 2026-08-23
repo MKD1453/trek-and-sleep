@@ -707,3 +707,32 @@ nav .active{color:var(--green)}
 .liveNavStrip strong{color:#9bea69;font-size:14px}
 .liveNavStripProgress{height:8px;background:#21352c;border-radius:999px;overflow:hidden;margin-top:8px}
 .liveNavStripProgress span{display:block;height:100%;background:#8ee53e}
+
+/* ===== Trek & Sleep V3.2 ===== */
+.v32Hud{
+  margin:8px 10px;padding:13px;border-radius:16px;background:#0d2018;
+  border:1px solid #3a5b49;box-shadow:0 8px 24px rgba(0,0,0,.24)
+}
+.v32Hud.offroute{background:#2c1715;border-color:#934940}
+.v32HudTop{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center}
+.v32TurnIcon{width:54px;height:54px;border-radius:16px;background:#193827;display:flex;align-items:center;justify-content:center;font-size:31px;font-weight:900}
+.v32Hud b,.v32Hud small{display:block}
+.v32Hud .mainText{font-size:20px}.v32Hud small{color:var(--muted);margin-top:2px}
+.v32Distance{font-size:23px;font-weight:900;color:#9bea69;white-space:nowrap}
+.v32Hud.offroute .v32Distance{color:#ffaaa2}
+.v32Next{margin-top:10px;padding:10px 11px;border-radius:12px;background:#15271f;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.v32Next strong{color:#cfe6d7}.v32Next small{font-size:10px;margin:0}
+.v32LiveGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.v32LiveGrid>div{padding:9px;border-radius:11px;background:#15261f}
+.v32LiveGrid b{font-size:15px}.v32LiveGrid small{font-size:8px}
+.v32Progress{height:8px;background:#20342b;border-radius:999px;overflow:hidden;margin-top:10px}
+.v32Progress span{display:block;height:100%;background:#8ee53e}
+.v32Panel{display:grid;gap:10px;margin-top:12px}
+.v32Setting{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px;border-radius:13px;background:#15261f}
+.v32Setting b,.v32Setting small{display:block}.v32Setting small{font-size:9px;color:var(--muted);margin-top:3px}
+.v32Setting input[type="checkbox"]{width:22px;height:22px}
+.v32Timeline{display:grid;gap:9px;margin-top:12px}
+.v32TimelineItem{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:12px;background:#14261e;border:1px solid #29483a}
+.v32TimelineIcon{width:42px;height:42px;border-radius:12px;background:#1b3729;display:flex;align-items:center;justify-content:center;font-size:24px}
+.v32TimelineItem b,.v32TimelineItem small{display:block}.v32TimelineItem small{font-size:9px;color:var(--muted);margin-top:2px}
+.v32TimelineItem strong{color:#9bea69}
