@@ -1,9 +1,9 @@
 {
-  "name": "Trek & Sleep V2.9",
+  "name": "Trek & Sleep V3.0",
   "short_name": "Trek & Sleep",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#07120e",
   "theme_color": "#07120e",
-  "description": "Trekking-App mit echtem Höhenprofil aus GPX oder automatisch nachgeladenen Höhendaten, Tour-Cockpit, GPS-Navigation, POIs und Sicherheitscenter."
+  "description": "Trekking-App mit Trail-Abbiegehinweisen, Etappenplan, Offline-Tourpaketen, Höhenprofil, GPS-Navigation, POIs und Sicherheitscenter."
 }

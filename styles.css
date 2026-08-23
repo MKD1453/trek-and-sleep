@@ -656,3 +656,22 @@ nav .active{color:var(--green)}
 .pill{display:inline-flex;padding:5px 9px;border-radius:999px;background:#26312b;color:#cad4ce;font-weight:800;font-size:12px}
 .pill.ok{background:#193923;color:#9bea69}
 .wide{width:100%;margin-top:12px}
+
+/* ===== Trek & Sleep V3.0 ===== */
+.trailHero,.dayHero,.offlineHero{border:1px solid #315343;background:#0f2119;border-radius:18px;padding:16px;margin:10px 0}
+.trailTop,.dayTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.trailTop h3,.dayTop h3{margin:0;font-size:23px}
+.trailBadge,.dayBadge{padding:6px 10px;border-radius:999px;background:#1b3c27;color:#9bea69;font-weight:900;white-space:nowrap}
+.turnCard{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;border:1px solid #345445;background:#12231b;border-radius:16px;padding:12px;margin:10px 0}
+.turnIcon{width:54px;height:54px;border-radius:16px;background:#193526;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900}
+.turnCard b,.turnCard small{display:block}.turnCard b{font-size:18px}.turnCard small{color:var(--muted);margin-top:4px}.turnDist{font-weight:900;color:#9bea69;white-space:nowrap}
+.stageCard{border:1px solid #2e4b3d;background:#102018;border-radius:16px;padding:14px;margin:12px 0}.stageCard h3{margin:0 0 4px;font-size:21px}
+.stageMeta{color:var(--muted);font-size:13px;margin-bottom:10px}.stageGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.stageMetric{background:#14261e;border-radius:13px;padding:11px}.stageMetric b,.stageMetric small{display:block}.stageMetric b{font-size:20px}.stageMetric small{font-size:11px;color:var(--muted);margin-top:3px}
+.poiStrip{display:flex;gap:8px;overflow:auto;padding:4px 0 2px}.poiStrip .pill{flex:0 0 auto}
+.offlineStatus{border:1px solid #345242;background:#13251d;border-radius:14px;padding:12px;margin:10px 0}.offlineStatus b,.offlineStatus small{display:block}
+.offlineStatus small{color:var(--muted);margin-top:4px;line-height:1.4}.offlineProgress{height:10px;background:#21352c;border-radius:999px;overflow:hidden;margin-top:10px}
+.offlineProgress>span{display:block;height:100%;background:#8ee53e;width:0}.offlineList{display:grid;gap:9px;margin-top:12px}
+.offlineItem{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #294136}.offlineItem:last-child{border-bottom:0}.offlineItem small{color:var(--muted)}
+.navHintBar{position:absolute;left:14px;right:14px;top:12px;z-index:700;background:rgba(8,24,18,.94);border:1px solid #3a5a49;border-radius:16px;padding:11px 13px;display:none;grid-template-columns:46px 1fr auto;gap:10px;align-items:center;backdrop-filter:blur(10px)}
+.navHintBar.show{display:grid}.navHintBar .ico{font-size:28px;text-align:center}.navHintBar b,.navHintBar small{display:block}.navHintBar small{color:#a9b6b0;margin-top:2px}.navHintBar strong{color:#9bea69}
