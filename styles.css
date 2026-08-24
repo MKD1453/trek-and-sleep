@@ -780,7 +780,7 @@ nav .active{color:var(--green)}
 .v332SaveOk{background:rgba(142,238,52,.13);border:1px solid rgba(142,238,52,.35);}
 .v332SaveError{background:rgba(255,174,66,.12);border:1px solid rgba(255,174,66,.38);}
 
-/* ===== Trek & Sleep V3.4 Jagd- & Sicherheitsmodul ===== */
+/* ===== Trek & Sleep V3.4.1 Jagd- & Sicherheitsmodul ===== */
 .huntHero{padding:15px;border-radius:17px;background:#122219;border:1px solid #385345}
 .huntHero.caution{background:#292114;border-color:#8b6a2c}
 .huntHero.high{background:#2d1816;border-color:#984a42}

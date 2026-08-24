@@ -1,7 +1,7 @@
-# Trek & Sleep V3.4
+# Trek & Sleep V3.4.1
 
 ## Jagd & Sicherheit
-V3.4 ergänzt die Tourwarnungen um ein standort- und datumsbezogenes Jagdmodul.
+V3.4.1 ergänzt die Tourwarnungen um ein standort- und datumsbezogenes Jagdmodul.
 
 ### Rheinland-Pfalz
 - Tourregion wird aus der geladenen GPX-Route erkannt.
@@ -15,7 +15,7 @@ V3.4 ergänzt die Tourwarnungen um ein standort- und datumsbezogenes Jagdmodul.
 - 90 Minuten vor bzw. rund um Sonnenauf-/untergang wird ein erhöhter Sicherheitshinweis gezeigt.
 
 ### Lokale Drückjagden / Sperrungen
-V3.4 erfindet bewusst keine lokalen Echtzeitjagden.
+V3.4.1 erfindet bewusst keine lokalen Echtzeitjagden.
 Solange keine bestätigte offizielle lokale Meldung geladen ist, steht ausdrücklich:
 „Keine bestätigte lokale Bewegungsjagd geladen“.
 
@@ -26,3 +26,12 @@ Kurzfristige Sperrungen, Beschilderung und Anweisungen vor Ort haben Vorrang.
 - V3.3.2 Tour-Aufzeichnung und GPX-Export
 - Offline-Daten
 - POIs, Warncenter, Rechts-Layer, Höhenprofil und Etappen
+
+
+## V3.4.1 – Jagdcenter-Fix
+- Jagd-Button erhält einen eigenen robusten `addEventListener`.
+- zusätzlicher Safari-Fallback nach vollständiger App-Initialisierung
+- Tourmittelpunkt unterstützt Array- und Objektkoordinaten
+- Fehler in Regions-/Dämmerungsberechnung können das Fenster nicht mehr still blockieren
+- falls das Jagdcenter intern scheitert, erscheint eine sichtbare Fehlermeldung mit „Erneut laden“
+- Navigation, Simulator und Track-Aufzeichnung wurden nicht verändert
