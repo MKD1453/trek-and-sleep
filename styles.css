@@ -779,3 +779,28 @@ nav .active{color:var(--green)}
 }
 .v332SaveOk{background:rgba(142,238,52,.13);border:1px solid rgba(142,238,52,.35);}
 .v332SaveError{background:rgba(255,174,66,.12);border:1px solid rgba(255,174,66,.38);}
+
+/* ===== Trek & Sleep V3.4 Jagd- & Sicherheitsmodul ===== */
+.huntHero{padding:15px;border-radius:17px;background:#122219;border:1px solid #385345}
+.huntHero.caution{background:#292114;border-color:#8b6a2c}
+.huntHero.high{background:#2d1816;border-color:#984a42}
+.huntHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.huntBadge{padding:6px 10px;border-radius:999px;font-weight:900;background:#24452b;color:#9bea69}
+.huntHero.caution .huntBadge{background:#5b4618;color:#ffd66b}
+.huntHero.high .huntBadge{background:#65302b;color:#ffaaa1}
+.huntGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.huntMetric{padding:11px;border-radius:12px;background:#15261f}
+.huntMetric b,.huntMetric small{display:block}.huntMetric b{font-size:18px}.huntMetric small{font-size:9px;color:var(--muted);margin-top:3px}
+.huntNotice{padding:12px;border-radius:14px;background:#14251e;border:1px solid #304c3e;margin-top:10px}
+.huntNotice.warn{border-color:#8b6a2c;background:#282114}
+.huntNotice.danger{border-color:#984a42;background:#2d1816}
+.huntNotice b,.huntNotice small{display:block}.huntNotice small{font-size:9px;color:var(--muted);margin-top:4px}
+.huntSpecies{display:grid;gap:8px;margin-top:12px}
+.huntSpeciesRow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;background:#14251e}
+.huntSpeciesRow small{display:block;color:var(--muted);font-size:9px;margin-top:3px}
+.huntStatus{padding:4px 8px;border-radius:999px;font-weight:800;background:#24452b;color:#9bea69}
+.huntStatus.open{background:#5b4618;color:#ffd66b}
+.huntStatus.closed{background:#23342c;color:#aac0b2}
+.huntFooter{margin-top:12px;padding:11px;border-radius:12px;background:#0d1d16;color:#a8b9ae;font-size:10px;line-height:1.45}
+.huntHud{margin:8px 10px;padding:10px 12px;border-radius:14px;background:#2a2114;border:1px solid #846227;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.huntHud b{color:#ffd66b}.huntHud small{display:block;color:#d5cdb8;font-size:9px}

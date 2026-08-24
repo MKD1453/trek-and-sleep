@@ -1,9 +1,9 @@
 {
-  "name": "Trek & Sleep V3.3.2",
+  "name": "Trek & Sleep V3.4",
   "short_name": "Trek & Sleep",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#07120e",
   "theme_color": "#07120e",
-  "description": "Trekking-App mit Tour-Aufzeichnung, Live-Statistik, GPX-Export, GPS-/Simulator-Navigation, Abbiegehinweisen, Offline-Touren, POIs und Höhenprofil."
+  "description": "Trekking-App mit Jagdzeiten- und Dämmerungswarnungen, Tour-Aufzeichnung, GPS-/Simulator-Navigation, Offline-Touren, POIs, Warncenter und Höhenprofil."
 }
