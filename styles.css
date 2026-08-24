@@ -854,7 +854,7 @@ body.modalOpen{overflow:hidden}
 #closeModal{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 button{touch-action:manipulation}
 
-/* ===== V3.6.2 authoritative interaction layer ===== */
+/* ===== V3.6.3 authoritative interaction layer ===== */
 .modal{
   position:fixed!important;
   inset:0!important;
@@ -900,3 +900,37 @@ button{touch-action:manipulation}
   -webkit-tap-highlight-color:rgba(0,0,0,0)!important;
 }
 body.modalOpen{overflow:hidden!important}
+
+
+/* ===== V3.6.3 top action bar interaction fix ===== */
+.top,
+.filters{
+  position:relative!important;
+  z-index:2000!important;
+  pointer-events:auto!important;
+  isolation:isolate!important;
+}
+.filters{
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  -webkit-overflow-scrolling:touch!important;
+  touch-action:pan-x!important;
+}
+.filters .chip,
+.filters button{
+  position:relative!important;
+  z-index:1!important;
+  flex:0 0 auto!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+main{
+  z-index:1!important;
+  isolation:isolate!important;
+}
+#map{position:relative!important;z-index:1!important}
+.drawer{z-index:700!important}
+.navHintBar{z-index:750!important}
+nav{z-index:2100!important}
+.modal{z-index:5000!important}

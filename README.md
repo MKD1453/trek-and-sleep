@@ -1,26 +1,14 @@
-# Trek & Sleep V3.6.2 — UI-Stabilitätsfix
+# Trek & Sleep V3.6.3 — obere Aktionsleiste
 
-Diese Version enthält bewusst keine neuen Features.
+Reiner UI-Stabilitätsfix auf Basis von V3.6.2.
 
-## Behobener Fehlerkomplex
-- Simulator führt die komplette Navigations-/Kartenberechnung nur noch 5× pro Sekunde statt bis zu 60×.
-  Dadurch bleibt Safaris Hauptthread für Touch, Buttons, Scrollen und Modals frei.
-- Alle alten direkten Modal-Aufrufe wurden auf einen zentralen Modal-Manager vereinheitlicht.
-- X, Hintergrund-Tipp und Herunterziehen vom oberen Rand schließen dasselbe Modal.
-- Versteckte Modals können keine Eingaben abfangen.
-- „Zum nächsten Hinweis“ arbeitet atomar und setzt eine laufende Simulation danach fort.
-- Jagd-Testzone wird wiederhergestellt, falls Leaflet sie während anderer Kartenupdates verliert.
-- Track-, Simulator- und Assistenzbuttons sind explizite `type=button`-Elemente.
-- Der UI-Watchdog greift nicht mehr in einen laufenden Simulator-Timer ein.
+## Änderungen
+- Versionsanzeige korrigiert (kein versehentliches V3.6.2.2 mehr).
+- Header und horizontale Aktionsleiste besitzen eine eigene Stacking-Ebene über Karte, Leaflet und Tour-Drawer.
+- `main` ist eine abgeschlossene niedrigere Stacking-Ebene, sodass Karten-/Drawer-Layer nicht mehr unsichtbar über die obere Leiste ragen können.
+- Buttons der Aktionsleiste erhalten explizite Pointer-/Touch-Freigabe für Safari.
+- zentrale Backup-Bindung stellt einen Funktionsbutton wieder her, falls sein normaler `onclick` verloren geht.
+- Simulator, Jagd, Navigation, Track und Modal-Logik wurden inhaltlich nicht verändert.
 
-## Pflicht-Regressionsprüfung
-Während die Simulation läuft:
-1. Assistenz öffnen, Einstellungen ändern, Testton, X schließen.
-2. Live öffnen, Sprache AN/AUS, Testansage, Fertig/X schließen.
-3. Simulator: ±100 m und „Zum nächsten Hinweis“.
-4. Jagd-Testzone auf der Karte prüfen.
-5. Track starten, pausieren, fortsetzen.
-6. Etappen öffnen und schließen.
-7. Gehgeschwindigkeit öffnen, ändern und über X bzw. Herunterziehen schließen.
-
-Erst wenn dieser kombinierte Ablauf funktioniert, gilt V3.6.2 als stabil.
+## Test
+Die horizontale Leiste nach rechts scrollen und nacheinander Tour planen, Punkte planen, Profil, Tour-Check, Cockpit, Trail, Etappen, Assistenz, Live, Simulator, Track und Jagd öffnen.
