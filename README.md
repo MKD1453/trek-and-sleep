@@ -1,27 +1,24 @@
-# Trek & Sleep V3.2.4
+# Trek & Sleep V3.3
 
-## Neuer Navigations-Simulator
-Mit dem Simulator lässt sich eine komplette Tour zuhause testen.
+## Neuer großer Schritt: Tour-Aufzeichnung
+- tatsächlichen gelaufenen Track mitschreiben
+- funktioniert mit echtem GPS und Navigations-Simulator
+- aufgezeichnete Distanz
+- Bewegungszeit
+- Durchschnittsgeschwindigkeit
+- maximale Abweichung von der geplanten GPX-Strecke
+- Aufzeichnung pausieren und fortsetzen
+- abgeschlossene Touren lokal speichern
+- gespeicherten Track als GPX exportieren
+- laufende Aufzeichnung wird lokal zwischengespeichert
+- kompaktes REC-HUD während der Navigation
 
-- virtuelle GPS-Position auf der geladenen GPX-Route
-- Simulation mit 1–8 km/h
-- +100 m / −100 m manuell springen
-- direkt zum nächsten Abbiegehinweis springen
-- Reststrecke und virtueller Fortschritt
-- 50 m / 100 m / 200 m Routenabweichung simulieren
-- Abbiegewarnung testen
-- Routenwarnung testen
-- Sprachansage testen
-- Live-HUD mit simuliertem GPS verwenden
-
-Während der Simulator aktiv ist, überschreibt echtes GPS die Testposition nicht.
-
-Alle Funktionen aus V3.2 bleiben erhalten.
-
-
-## V3.2.4 Stabilitätsfix
-- lange Kurven bleiben nicht mehr dauerhaft bei 0 m hängen
-- passierte Abbiegehinweise werden endgültig als erledigt markiert
-- bereits erledigte Hinweise können nicht zurückspringen
-- Hysterese verhindert Flackern an weichen/langen Kurven
-- der Simulator läuft auch dann weiter, wenn ein UI-Update einmal fehlschlägt
+## Bestehende Navigation
+Die stabile V3.2.4-Kurvenlogik bleibt unverändert erhalten:
+- automatische Abbiegehinweise
+- Hysterese gegen Flackern
+- Simulator
+- Ton, Vibration und Sprache
+- Routenabweichungs-Hilfe
+- Offline-Tourdaten
+- Höhenprofil und Etappen
