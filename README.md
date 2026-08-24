@@ -1,54 +1,26 @@
-# Trek & Sleep V3.6.1 — Stabilitätsrelease
+# Trek & Sleep V3.6.2 — UI-Stabilitätsfix
 
-V3.6.1 fügt bewusst keine neue Nutzerfunktion hinzu. Ziel ist, die bereits getesteten
-Funktionen wieder gemeinsam stabil zu betreiben.
+Diese Version enthält bewusst keine neuen Features.
 
-## Stabilitätsumbau
-- Simulator läuft nach „Start“ im Hintergrund; das Simulatorfenster blockiert dadurch
-  nicht mehr Jagd, Live-Navigation, Track oder andere Hauptbuttons.
-- nur ein aktiver requestAnimationFrame für den Simulator
-- zentraler Modal-Manager für Öffnen/Schließen
-- keine globalen Touch-/Pointer-Capture-Listener am Modal
-- Jagd-Button nur einmal gebunden
-- Sprach-AN/AUS ändert den Zustand ohne das Fenster neu aufzubauen
-- versteckte Modals können keine Touch-Eingaben abfangen
-- Navigation, Jagd-Radar und Track bleiben funktional getrennt
+## Behobener Fehlerkomplex
+- Simulator führt die komplette Navigations-/Kartenberechnung nur noch 5× pro Sekunde statt bis zu 60×.
+  Dadurch bleibt Safaris Hauptthread für Touch, Buttons, Scrollen und Modals frei.
+- Alle alten direkten Modal-Aufrufe wurden auf einen zentralen Modal-Manager vereinheitlicht.
+- X, Hintergrund-Tipp und Herunterziehen vom oberen Rand schließen dasselbe Modal.
+- Versteckte Modals können keine Eingaben abfangen.
+- „Zum nächsten Hinweis“ arbeitet atomar und setzt eine laufende Simulation danach fort.
+- Jagd-Testzone wird wiederhergestellt, falls Leaflet sie während anderer Kartenupdates verliert.
+- Track-, Simulator- und Assistenzbuttons sind explizite `type=button`-Elemente.
+- Der UI-Watchdog greift nicht mehr in einen laufenden Simulator-Timer ein.
 
-## Regressionstest V3.6.1
-### Simulator
-- Start / Hintergrundlauf
-- Pause / Weiter
-- +100 m / -100 m
-- nächster Hinweis
-- mehrere Kurven / lange Kurven
-- Ziel / Reset
+## Pflicht-Regressionsprüfung
+Während die Simulation läuft:
+1. Assistenz öffnen, Einstellungen ändern, Testton, X schließen.
+2. Live öffnen, Sprache AN/AUS, Testansage, Fertig/X schließen.
+3. Simulator: ±100 m und „Zum nächsten Hinweis“.
+4. Jagd-Testzone auf der Karte prüfen.
+5. Track starten, pausieren, fortsetzen.
+6. Etappen öffnen und schließen.
+7. Gehgeschwindigkeit öffnen, ändern und über X bzw. Herunterziehen schließen.
 
-### Live
-- öffnen
-- Sprachansage AN/AUS
-- Testansage
-- nächster Hinweis AN/AUS
-- X / Fertig / Hintergrund schließen
-
-### Jagd
-- Jagdcenter öffnen/schließen
-- TEST-Jagdzone an/aus
-- Entfernung zur Testzone
-- Eintritt / Verlassen
-- keine Blockade anderer Buttons
-
-### Track
-- Start / Pause / Weiter
-- Beenden & speichern
-- gespeicherte Aufzeichnung sichtbar
-- GPX exportieren
-
-Neue Features kommen erst nach bestandenem Stabilitätstest.
-
-
-## V3.6.1 – Jagd-Test-Schalter
-- Jagd-Testzustand ist vom jeweiligen Fenster entkoppelt.
-- Simulator aktualisiert nach dem Umschalten nur den Simulator.
-- Jagdcenter aktualisiert nach dem Umschalten nur das Jagdcenter.
-- localStorage-Fehler können den Schalter nicht mehr blockieren.
-- Jagdzone und Sicherheitsstatus werden nach jedem Umschalten neu berechnet.
+Erst wenn dieser kombinierte Ablauf funktioniert, gilt V3.6.2 als stabil.

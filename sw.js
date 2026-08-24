@@ -1,4 +1,4 @@
-const SHELL='trek-sleep-v361';
+const SHELL='trek-sleep-v362';
 const RUNTIME='trek-sleep-v321-runtime';
 const ASSETS=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest'];
 

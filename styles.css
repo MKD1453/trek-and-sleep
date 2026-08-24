@@ -853,3 +853,50 @@ body:not(.modalOpen) .modal.hidden{pointer-events:none!important}
 body.modalOpen{overflow:hidden}
 #closeModal{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 button{touch-action:manipulation}
+
+/* ===== V3.6.2 authoritative interaction layer ===== */
+.modal{
+  position:fixed!important;
+  inset:0!important;
+  z-index:5000!important;
+  display:flex!important;
+  align-items:flex-end!important;
+  justify-content:center!important;
+  background:rgba(0,0,0,.72)!important;
+  pointer-events:auto!important;
+}
+.modal.hidden{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+.sheet{
+  position:relative!important;
+  width:min(560px,100%)!important;
+  max-height:80vh!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior:contain!important;
+  pointer-events:auto!important;
+  touch-action:pan-y!important;
+}
+#modalBody,.sheet button,.sheet input,.sheet select,.sheet label{
+  pointer-events:auto!important;
+}
+#modalBody{position:relative!important;z-index:1!important}
+#closeModal{
+  position:sticky!important;
+  top:0!important;
+  margin-left:auto!important;
+  z-index:100!important;
+  display:grid!important;
+  place-items:center!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+.sheet button{
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:rgba(0,0,0,0)!important;
+}
+body.modalOpen{overflow:hidden!important}
