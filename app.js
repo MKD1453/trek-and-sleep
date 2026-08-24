@@ -604,6 +604,25 @@ function v321Step(deltaKm){
  v321Sim.alongKm=Math.max(0,Math.min(total,v321Sim.alongKm+deltaKm));
  v321ApplySimPosition();
 }
+// V3.5.1: manual simulator jumps are atomic. Pause the animation frame,
+// move exactly the requested distance, refresh navigation/safety once,
+// then resume only if the simulator was running before the tap.
+function v351ManualStep(deltaKm){
+ const wasRunning=!!v321Sim.running;
+ if(v321Sim.timer)cancelAnimationFrame(v321Sim.timer);
+ v321Sim.timer=null;
+ v321Sim.running=false;
+ v321Sim.lastTs=0;
+ v321Sim.active=true;
+ v321Step(deltaKm);
+ try{v35UpdateSafety?.()}catch(e){}
+ openSimulatorCenter();
+ if(wasRunning){
+   v321Sim.running=true;
+   v321Sim.lastTs=0;
+   v321Sim.timer=requestAnimationFrame(v321Tick);
+ }
+}
 function v321Tick(ts){
  if(!v321Sim.running)return;
  if(!v321Sim.lastTs)v321Sim.lastTs=ts;
@@ -691,7 +710,7 @@ function v321SimStatus(){
 function openSimulatorCenter(){
  const s=v321SimStatus();
  $('#modalBody').innerHTML=`
- <span class="tag">🧪 Navigations-Simulator · V3.5.0</span><h2>Tour zuhause testen</h2>
+ <span class="tag">🧪 Navigations-Simulator · V3.5.1</span><h2>Tour zuhause testen</h2>
  <div class="simCard">
    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
      <div><h3>${v321Sim.running?'Simulation läuft':v321Sim.active?'Simulation pausiert':'Simulator bereit'}</h3><small>Virtuelle GPS-Position entlang der geladenen GPX-Route.</small></div>
@@ -750,8 +769,8 @@ function openSimulatorCenter(){
  $('#simSpeed').oninput=e=>{v321Sim.speedKmh=Number(e.target.value);};
  $('#simStart').onclick=v321Start;
  $('#simPause').onclick=v321Pause;
- $('#simBack').onclick=()=>{v321Step(-.1);openSimulatorCenter()};
- $('#simForward').onclick=()=>{v321Step(.1);openSimulatorCenter()};
+ $('#simBack').onclick=()=>v351ManualStep(-.1);
+ $('#simForward').onclick=()=>v351ManualStep(.1);
  $('#simNextTurn').onclick=v321JumpToNextTurn;
  $('#simReset').onclick=v321Reset;
  document.querySelectorAll('.simDev').forEach(b=>b.onclick=()=>v321SetDeviation(Number(b.dataset.m)));
