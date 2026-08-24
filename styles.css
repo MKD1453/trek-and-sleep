@@ -752,7 +752,7 @@ nav .active{color:var(--green)}
 .simBadge.off{background:#3c2924;color:#ffb1a8}
 .simDeviation{display:flex;gap:8px;flex-wrap:wrap}
 
-/* ===== Trek & Sleep V3.3.1 Track-Aufzeichnung ===== */
+/* ===== Trek & Sleep V3.3.2 Track-Aufzeichnung ===== */
 .trackCard{padding:14px;border-radius:16px;background:#102119;border:1px solid #355444}
 .trackCard.recording{border-color:#8a443d;background:#251714}
 .trackHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
@@ -772,3 +772,10 @@ nav .active{color:var(--green)}
 .trackHud{margin:8px 10px;padding:10px 11px;border-radius:14px;background:#102019;border:1px solid #355444}
 .trackHudTop{display:flex;justify-content:space-between;gap:10px;align-items:center}
 .trackHud strong{color:#ff9b92}.trackHud small{color:var(--muted)}
+
+/* V3.3.2 save feedback */
+.v332SaveOk,.v332SaveError{
+  padding:12px 14px;margin:0 0 12px;border-radius:14px;font-weight:800;
+}
+.v332SaveOk{background:rgba(142,238,52,.13);border:1px solid rgba(142,238,52,.35);}
+.v332SaveError{background:rgba(255,174,66,.12);border:1px solid rgba(255,174,66,.38);}

@@ -1,4 +1,4 @@
-# Trek & Sleep V3.3.1
+# Trek & Sleep V3.3.2
 
 ## Neuer großer Schritt: Tour-Aufzeichnung
 - tatsächlichen gelaufenen Track mitschreiben
@@ -24,9 +24,18 @@ Die stabile V3.2.4-Kurvenlogik bleibt unverändert erhalten:
 - Höhenprofil und Etappen
 
 
-## V3.3.1 Fix
+## V3.3.2 Fix
 - „Beenden & speichern“ speichert die Aufzeichnung zuerst verifiziert in der lokalen Historie.
 - Erst nach erfolgreicher Speicherung wird der aktive Track zurückgesetzt.
 - Das Aufzeichnungsfenster aktualisiert sich sofort nach dem Speichern.
 - Doppelklicks während des Speicherns werden blockiert.
 - Falls localStorage fehlschlägt, bleibt die fertige Aufzeichnung im Speicher erhalten und wird nicht verworfen.
+
+
+## V3.3.2 – Speicher-Fix
+- Ursache behoben: Beim Speichern wurde auf eine nicht vorhandene Variable `currentRoute` zugegriffen.
+- Der Tourname wird jetzt aus dem tatsächlich vorhandenen `#routeName` gelesen.
+- „Speichere …“ kann bei einem JavaScript-Fehler nicht mehr dauerhaft hängen bleiben.
+- Erfolgreiche Speicherung zeigt kurz „✓ Tour gespeichert“.
+- Bei einem Speicherfehler bleibt die Aufzeichnung für einen erneuten Versuch erhalten.
+- Trackpunkte werden vor dem Speichern auf einfache, JSON-sichere Zahlenwerte reduziert.
