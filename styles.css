@@ -826,3 +826,23 @@ nav .active{color:var(--green)}
   accent-color:#2f80ed;
 }
 #v32Save,#v32VoiceTest{touch-action:manipulation;pointer-events:auto}
+
+/* ===== V3.5.3 stability audit fixes ===== */
+.sheet{position:relative}
+.close{
+  position:sticky!important;top:0!important;right:0!important;float:none!important;
+  margin-left:auto!important;display:grid!important;place-items:center!important;
+  z-index:200!important;touch-action:manipulation!important;pointer-events:auto!important;
+}
+.v353SettingBtn{
+  width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  background:#14251e;color:#fff;border:1px solid #314b3f;border-radius:15px;
+  padding:14px 16px;margin:10px 0;text-align:left;touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+.v353SettingBtn div{min-width:0}.v353SettingBtn b,.v353SettingBtn small{display:block}
+.v353SettingBtn small{color:var(--muted);font-size:10px;margin-top:4px;line-height:1.35}
+.v353SettingBtn span{min-width:54px;text-align:center;padding:8px 10px;border-radius:999px;background:#293832;color:#b9c5c0;font-weight:900}
+.v353SettingBtn[aria-pressed="true"]{border-color:#4b714f;background:#173022}
+.v353SettingBtn[aria-pressed="true"] span{background:#28532f;color:#9bea69}
+#v32VoiceTest,#v32Done{margin-top:10px;touch-action:manipulation}
