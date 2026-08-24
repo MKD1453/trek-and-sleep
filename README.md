@@ -1,6 +1,6 @@
-# Trek & Sleep V3.6 — Stabilitätsrelease
+# Trek & Sleep V3.6.1 — Stabilitätsrelease
 
-V3.6 fügt bewusst keine neue Nutzerfunktion hinzu. Ziel ist, die bereits getesteten
+V3.6.1 fügt bewusst keine neue Nutzerfunktion hinzu. Ziel ist, die bereits getesteten
 Funktionen wieder gemeinsam stabil zu betreiben.
 
 ## Stabilitätsumbau
@@ -14,7 +14,7 @@ Funktionen wieder gemeinsam stabil zu betreiben.
 - versteckte Modals können keine Touch-Eingaben abfangen
 - Navigation, Jagd-Radar und Track bleiben funktional getrennt
 
-## Regressionstest V3.6
+## Regressionstest V3.6.1
 ### Simulator
 - Start / Hintergrundlauf
 - Pause / Weiter
@@ -44,3 +44,11 @@ Funktionen wieder gemeinsam stabil zu betreiben.
 - GPX exportieren
 
 Neue Features kommen erst nach bestandenem Stabilitätstest.
+
+
+## V3.6.1 – Jagd-Test-Schalter
+- Jagd-Testzustand ist vom jeweiligen Fenster entkoppelt.
+- Simulator aktualisiert nach dem Umschalten nur den Simulator.
+- Jagdcenter aktualisiert nach dem Umschalten nur das Jagdcenter.
+- localStorage-Fehler können den Schalter nicht mehr blockieren.
+- Jagdzone und Sicherheitsstatus werden nach jedem Umschalten neu berechnet.

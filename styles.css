@@ -847,7 +847,7 @@ nav .active{color:var(--green)}
 .v353SettingBtn[aria-pressed="true"] span{background:#28532f;color:#9bea69}
 #v32VoiceTest,#v32Done{margin-top:10px;touch-action:manipulation}
 
-/* ===== V3.6 stability release ===== */
+/* ===== V3.6.1 stability release ===== */
 .modal.hidden{display:none!important;pointer-events:none!important}
 body:not(.modalOpen) .modal.hidden{pointer-events:none!important}
 body.modalOpen{overflow:hidden}
