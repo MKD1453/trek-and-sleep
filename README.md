@@ -1,14 +1,33 @@
-# Trek & Sleep V3.6.3 — obere Aktionsleiste
+# Trek & Sleep V3.6.4 — Modal-Manager Root-Cause Fix
 
-Reiner UI-Stabilitätsfix auf Basis von V3.6.2.
+V3.6.4 enthält keinen neuen Funktionsumfang.
 
-## Änderungen
-- Versionsanzeige korrigiert (kein versehentliches V3.6.2.2 mehr).
-- Header und horizontale Aktionsleiste besitzen eine eigene Stacking-Ebene über Karte, Leaflet und Tour-Drawer.
-- `main` ist eine abgeschlossene niedrigere Stacking-Ebene, sodass Karten-/Drawer-Layer nicht mehr unsichtbar über die obere Leiste ragen können.
-- Buttons der Aktionsleiste erhalten explizite Pointer-/Touch-Freigabe für Safari.
-- zentrale Backup-Bindung stellt einen Funktionsbutton wieder her, falls sein normaler `onclick` verloren geht.
-- Simulator, Jagd, Navigation, Track und Modal-Logik wurden inhaltlich nicht verändert.
+## Behobene Ursache
+In V3.6.2/V3.6.3 enthielt der zentrale Modal-Manager versehentlich:
 
-## Test
-Die horizontale Leiste nach rechts scrollen und nacheinander Tour planen, Punkte planen, Profil, Tour-Check, Cockpit, Trail, Etappen, Assistenz, Live, Simulator, Track und Jagd öffnen.
+    function showAppModal() {
+      ...
+      showAppModal();
+      ...
+    }
+
+Dadurch rief sich `showAppModal()` beim Öffnen eines Fensters rekursiv selbst auf.
+Safari lief in einen Stack-Overflow. Funktionen, die ein Modal öffnen, konnten
+deshalb nicht oder nur fehlerhaft reagieren.
+
+V3.6.4 ersetzt diesen Aufruf wieder durch:
+
+    modal.classList.remove('hidden');
+
+## Nicht verändert
+- Simulatorlogik
+- Jagd-Radar
+- Navigation
+- Track-Aufzeichnung
+- Etappen
+- Assistenz
+- Sprachansagen
+- Kartenlogik
+- obere Aktionsleiste
+
+Diese Version korrigiert gezielt nur den nachgewiesenen Modal-Manager-Fehler.
