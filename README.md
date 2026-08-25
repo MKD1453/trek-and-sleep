@@ -1,33 +1,32 @@
-# Trek & Sleep V3.6.4 — Modal-Manager Root-Cause Fix
+# Trek & Sleep V3.6.0 — Clean Rebuild
 
-V3.6.4 enthält keinen neuen Funktionsumfang.
+Dieser Build wurde ausschließlich aus dem auf dem iPhone zuvor erfolgreich getesteten
+V3.4.1-Stand erstellt. Es wurde kein Code aus V3.5.x oder den späteren fehlerhaften
+V3.6.x-Patches übernommen.
 
-## Behobene Ursache
-In V3.6.2/V3.6.3 enthielt der zentrale Modal-Manager versehentlich:
-
-    function showAppModal() {
-      ...
-      showAppModal();
-      ...
-    }
-
-Dadurch rief sich `showAppModal()` beim Öffnen eines Fensters rekursiv selbst auf.
-Safari lief in einen Stack-Overflow. Funktionen, die ein Modal öffnen, konnten
-deshalb nicht oder nur fehlerhaft reagieren.
-
-V3.6.4 ersetzt diesen Aufruf wieder durch:
-
-    modal.classList.remove('hidden');
-
-## Nicht verändert
-- Simulatorlogik
-- Jagd-Radar
-- Navigation
-- Track-Aufzeichnung
+## Enthalten
+- Karte / GPX / POIs
+- Tour- und Punkteplanung
 - Etappen
-- Assistenz
-- Sprachansagen
-- Kartenlogik
-- obere Aktionsleiste
+- Navigationsassistenz
+- Live-Navigation
+- V3.2.4-Simulator
+- V3.3.2-Track-Aufzeichnung und GPX-Export
+- V3.4.1-Jagdcenter
 
-Diese Version korrigiert gezielt nur den nachgewiesenen Modal-Manager-Fehler.
+## Bewusst nicht übernommen
+- Jagd-Radar-Testzone aus V3.5.x
+- spätere zentrale Modal-Manager
+- UI-Watchdogs
+- Pointer-/Touch-Fallback-Kaskaden
+- spätere Simulator-Patches
+
+## Kleine Bereinigungen
+- Jagd-Button besitzt nur noch eine Event-Bindung statt Fallback + Hauptbindung.
+- komplett neue Service-Worker-Cache-Namen
+- App-Dateien werden online network-first geladen; offline erfolgt Cache-Fallback.
+
+## Testreihenfolge
+Zuerst ohne Simulator: Tour planen, Punkte planen, Etappen, Assistenz, Live, Track, Jagd.
+Danach Simulator: Start, Pause, ±100 m, nächster Hinweis, mehrere Kurven.
+Erst danach Fenster während laufender Simulation öffnen.

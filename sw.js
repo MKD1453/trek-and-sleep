@@ -1,5 +1,5 @@
-const SHELL='trek-sleep-v364';
-const RUNTIME='trek-sleep-v321-runtime';
+const SHELL='trek-sleep-v360-clean';
+const RUNTIME='trek-sleep-v360-runtime';
 const ASSETS=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest'];
 
 self.addEventListener('install',event=>{
@@ -20,11 +20,13 @@ self.addEventListener('fetch',event=>{
 
   if(url.origin===self.location.origin){
     event.respondWith(
-      caches.match(req).then(hit=>hit||fetch(req).then(resp=>{
-        const copy=resp.clone();
-        caches.open(SHELL).then(c=>c.put(req,copy));
+      fetch(req).then(resp=>{
+        if(resp && resp.ok){
+          const copy=resp.clone();
+          caches.open(SHELL).then(c=>c.put(req,copy));
+        }
         return resp;
-      }).catch(()=>caches.match('./index.html')))
+      }).catch(()=>caches.match(req).then(hit=>hit||caches.match('./index.html')))
     );
     return;
   }

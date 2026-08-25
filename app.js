@@ -56,8 +56,6 @@ const LEGAL_DEMO=[
 ];
 
 function init(){
- if(!window.v36HealthTimer)window.v36HealthTimer=setInterval(v36UiHealth,3000);
- setTimeout(()=>{try{bindModalSafety()}catch(e){}},0);
 
  v33RestoreRecording?.();
  if(!window.v32EngineTimer)window.v32EngineTimer=setInterval(()=>{try{v32UpdateEngine();v32InjectHud()}catch(e){}},2000);
@@ -102,7 +100,6 @@ function init(){
    })
  });
  map.addLayer(clusterLayer);
- setTimeout(()=>{try{v35DrawTestZone?.()}catch(e){}},0);
 
  const restored=restoreRoute();
  if(!restored){
@@ -115,7 +112,7 @@ function init(){
 }
 
 
-/* ===== V3.6.4: Navigationsassistenz ===== */
+/* ===== V3.6.0: Navigationsassistenz ===== */
 const V31_ASSIST_KEY='trek_sleep_v31_assist';
 let v31Assist=loadV31Assist();
 let v31LastAlert={turn:null,stop:null,offRoute:0};
@@ -243,7 +240,7 @@ function v31CheckAlerts(){
 }
 function openNavAssistSettings(){
  $('#modalBody').innerHTML=`
- <span class="tag">🔔 Navigationsassistenz · V3.6.4</span><h2>Hinweise unterwegs</h2>
+ <span class="tag">🔔 Navigationsassistenz · V3.6.0</span><h2>Hinweise unterwegs</h2>
  <div class="navAssistSettings">
    <div class="navAssistSetting"><div><b>Ton</b><small>Kurzer Signalton vor Abzweigungen, Stopps und bei Routenabweichung.</small></div><input id="v31Sound" type="checkbox" ${v31Assist.sound?'checked':''}></div>
    <div class="navAssistSetting"><div><b>Vibration</b><small>Vibrationsmuster auf unterstützten Geräten.</small></div><input id="v31Vib" type="checkbox" ${v31Assist.vibration?'checked':''}></div>
@@ -251,9 +248,9 @@ function openNavAssistSettings(){
    <div class="navAssistSetting"><div><b>Stoppwarnung</b><small>Entfernung vor einem geplanten Zwischenstopp/Ziel.</small></div><select id="v31Stop">${[40,60,80,100,150].map(v=>`<option value="${v}" ${v31Assist.stopWarnM===v?'selected':''}>${v} m</option>`).join('')}</select></div>
    <div class="navAssistSetting"><div><b>Route verlassen</b><small>Ab dieser Entfernung zur GPX-Linie warnen.</small></div><select id="v31Off">${[40,60,70,100,150].map(v=>`<option value="${v}" ${v31Assist.offRouteWarnM===v?'selected':''}>${v} m</option>`).join('')}</select></div>
  </div>
- <button id="v31SaveAssist" type="button" class="primary wide">Einstellungen speichern</button>
- <button id="v31TestAssist" type="button" class="toolBtn wide">Ton/Vibration testen</button>`;
- showAppModal();
+ <button id="v31SaveAssist" class="primary wide">Einstellungen speichern</button>
+ <button id="v31TestAssist" class="toolBtn wide">Ton/Vibration testen</button>`;
+ $('#modal').classList.remove('hidden');
 
  $('#v31SaveAssist').onclick=()=>{
    v31Assist={
@@ -263,7 +260,7 @@ function openNavAssistSettings(){
      stopWarnM:Number($('#v31Stop').value),
      offRouteWarnM:Number($('#v31Off').value)
    };
-   saveV31Assist();closeAppModal();
+   saveV31Assist();$('#modal').classList.add('hidden');
  };
  $('#v31TestAssist').onclick=()=>v31Notify('turn');
 }
@@ -284,7 +281,7 @@ function v31LiveStripHtml(){
 }
 
 
-/* ===== V3.6.4: GPS-gesteuerte Live-Navigation ===== */
+/* ===== V3.6.0: GPS-gesteuerte Live-Navigation ===== */
 const V32_KEY='trek_sleep_v32_live';
 let v32Settings=loadV32Settings();
 let v32State={
@@ -307,28 +304,14 @@ function loadV32Settings(){
 function saveV32Settings(){
  localStorage.setItem(V32_KEY,JSON.stringify(v32Settings));
 }
-function v32Speak(text,force=false){
- if((!v32Settings.voice && !force) || !('speechSynthesis' in window) || !window.SpeechSynthesisUtterance)return false;
+function v32Speak(text){
+ if(!v32Settings.voice || !('speechSynthesis' in window))return;
  try{
-   const synth=window.speechSynthesis;
-   const msg=String(text||'').trim();
-   if(!msg)return false;
-   synth.cancel();
-   try{synth.resume()}catch(e){}
-   const u=new SpeechSynthesisUtterance(msg);
-   u.lang='de-DE';u.rate=.92;u.pitch=1;u.volume=1;
-   try{
-     const voices=synth.getVoices?.()||[];
-     const de=voices.find(v=>/^de(-|_)/i.test(v.lang||''));
-     if(de)u.voice=de;
-   }catch(e){}
-   u.onerror=(ev)=>console.warn('Sprachansage Fehler',ev?.error||ev);
-   synth.speak(u);
-   return true;
- }catch(e){
-   console.warn('Sprachansage fehlgeschlagen',e);
-   return false;
- }
+   speechSynthesis.cancel();
+   const u=new SpeechSynthesisUtterance(text);
+   u.lang='de-DE';u.rate=.95;u.pitch=1;
+   speechSynthesis.speak(u);
+ }catch(e){}
 }
 function v32GpsTracking(){
  if(!navigationSession?.active || !navLiveMode?.())return null;
@@ -343,7 +326,7 @@ function v32UpcomingTurns(limit=3){
  const track=v32GpsTracking();
  const along=track?track.alongKm:(v30CurrentAlong?.()||0);
 
- // V3.6.4: once a turn is completed, never select it again.
+ // V3.6.0: once a turn is completed, never select it again.
  return (v30TrailHints||[])
    .filter(h=>!v32State.passedTurns?.has?.(h.idx))
    .filter(h=>h.alongKm>=along-.01)
@@ -479,55 +462,28 @@ function v32TimelineHtml(){
  }).join('')}</div>`;
 }
 function openLiveNavCenter(){
- const modal=$('#modal'),body=$('#modalBody');
- if(!modal||!body)return;
  const live=!!(navigationSession?.active && navLiveMode?.());
- const voiceOn=!!v32Settings.voice, previewOn=!!v32Settings.previewNext;
- body.innerHTML=`
- <span class="tag">🧭 Live-Navigation · V3.6.4</span><h2>GPS-Navigation</h2>
+ $('#modalBody').innerHTML=`
+ <span class="tag">🧭 Live-Navigation · V3.6.0</span><h2>GPS-Navigation</h2>
  ${live?v32LiveHudHtml():`<div class="card"><b>Vor-Tour-Modus</b><p>Die GPS-gesteuerte Navigation wird erst am Tourstart aktiviert.</p></div>`}
  ${live?v32TimelineHtml():''}
  <div class="v32Panel">
-   <button id="v353VoiceToggle" type="button" class="v353SettingBtn" aria-pressed="${voiceOn}">
-     <div><b>Sprachansagen</b><small>Deutsche Ansage vor dem nächsten Richtungswechsel.</small></div>
-     <span>${voiceOn?'AN':'AUS'}</span>
-   </button>
-   <button id="v353PreviewToggle" type="button" class="v353SettingBtn" aria-pressed="${previewOn}">
-     <div><b>Nächsten Hinweis zeigen</b><small>Blendet unter dem aktuellen Manöver bereits den folgenden Hinweis ein.</small></div>
-     <span>${previewOn?'AN':'AUS'}</span>
-   </button>
+   <div class="v32Setting"><div><b>Sprachansagen</b><small>Deutsche Ansage vor dem nächsten Richtungswechsel.</small></div><input id="v32Voice" type="checkbox" ${v32Settings.voice?'checked':''}></div>
+   <div class="v32Setting"><div><b>Nächsten Hinweis zeigen</b><small>Blendet unter dem aktuellen Manöver bereits den folgenden Hinweis ein.</small></div><input id="v32Preview" type="checkbox" ${v32Settings.previewNext?'checked':''}></div>
  </div>
- <button id="v32VoiceTest" type="button" class="toolBtn wide">🔊 Sprachansage testen</button>
- <button id="v32Done" type="button" class="primary wide">Fertig</button>`;
- showAppModal();
- bindModalSafety();
+ <button id="v32Save" class="primary wide">Live-Einstellungen speichern</button>
+ ${live?'<button id="v32VoiceTest" class="toolBtn wide">Sprachansage testen</button>':''}`;
+ $('#modal').classList.remove('hidden');
 
- const voiceBtn=$('#v353VoiceToggle');
- const previewBtn=$('#v353PreviewToggle');
- const test=$('#v32VoiceTest');
- const done=$('#v32Done');
-
- if(voiceBtn)voiceBtn.onclick=(ev)=>{
-   ev.preventDefault();ev.stopPropagation();
-   v32Settings.voice=!v32Settings.voice;
+ $('#v32Save').onclick=()=>{
+   v32Settings.voice=$('#v32Voice').checked;
+   v32Settings.previewNext=$('#v32Preview').checked;
    saveV32Settings();
-   voiceBtn.setAttribute('aria-pressed',String(!!v32Settings.voice));
-   const badge=voiceBtn.querySelector('span');if(badge)badge.textContent=v32Settings.voice?'AN':'AUS';
-   if(v32Settings.voice)v32Speak('Sprachansagen sind aktiviert.',true);
+   openLiveNavCenter();
  };
- if(previewBtn)previewBtn.onclick=(ev)=>{
-   ev.preventDefault();ev.stopPropagation();
-   v32Settings.previewNext=!v32Settings.previewNext;
-   saveV32Settings();
-   previewBtn.setAttribute('aria-pressed',String(!!v32Settings.previewNext));
-   const badge=previewBtn.querySelector('span');if(badge)badge.textContent=v32Settings.previewNext?'AN':'AUS';
+ if($('#v32VoiceTest'))$('#v32VoiceTest').onclick=()=>{
+   const old=v32Settings.voice;v32Settings.voice=true;v32Speak('In 50 Metern rechts abbiegen.');v32Settings.voice=old;
  };
- if(test)test.onclick=(ev)=>{
-   ev.preventDefault();ev.stopPropagation();
-   if(!v32Speak('Test der Sprachansage. In 50 Metern rechts abbiegen.',true))
-     alert('Sprachansage wird von diesem Browser momentan nicht unterstützt.');
- };
- if(done)done.onclick=(ev)=>{ev.preventDefault();ev.stopPropagation();closeAppModal()};
 }
 function v32InjectHud(){
  const host=$('#mapTourStatusHost');
@@ -545,7 +501,7 @@ function v32InjectHud(){
 }
 
 
-/* ===== V3.6.4: Navigations-Simulator ===== */
+/* ===== V3.6.0: Navigations-Simulator ===== */
 let v321Sim={
  active:false,
  running:false,
@@ -585,16 +541,15 @@ function v321ApplySimPosition(){
  };
  try{
    if(userMarker)userMarker.setLatLng([o.lat,o.lon]);
-   else if(map)userMarker=L.circleMarker([o.lat,o.lon],{radius:8,color:'#fff',weight:2,fillColor:'#2f8cff',fillOpacity:1}).addTo(map);
+   else if(map)L.circleMarker([o.lat,o.lon],{radius:8,color:'#fff',weight:2,fillColor:'#2f8cff',fillOpacity:1}).addTo(map);
  }catch(e){}
  navigationSession.active=true;
  try{if(typeof navigationSession.startedAt==='undefined')navigationSession.startedAt=Date.now()}catch(e){}
  v32State.lastGpsAt=Date.now();
  v32State.lastAlong=v321Sim.alongKm;
  v32UpdateEngine?.();
- try{v35UpdateSafety?.()}catch(e){}
 
- // V3.6.4: A simulator run is governed by the GPX end, not by an
+ // V3.6.0: A simulator run is governed by the GPX end, not by an
  // intermediate navigation/stage state. Some route plans can temporarily
  // mark a stage as finished while passing a generated turn. Keep the
  // navigation session alive until the virtual position reaches the true
@@ -611,7 +566,7 @@ function v321ApplySimPosition(){
      liveNavState.active=true;
    }
 
-   // V3.6.4: every virtual GPS fix must drive the same navigation UI/update
+   // V3.6.0: every virtual GPS fix must drive the same navigation UI/update
    // path as a real GPS fix. Re-select the next unpassed trail instruction
    // and force the live navigation HUD/status to stay visible.
    if(v30TrailHints?.length){
@@ -624,6 +579,7 @@ function v321ApplySimPosition(){
        }
      }
    }
+   try{v32UpdateEngine?.()}catch(e){console.warn('v32 engine',e)}
    try{v32InjectHud?.()}catch(e){console.warn('v32 hud',e)}
    try{renderMapTourStatus?.()}catch(e){console.warn('tour status',e)}
    return;
@@ -637,41 +593,12 @@ function v321Step(deltaKm){
  v321Sim.alongKm=Math.max(0,Math.min(total,v321Sim.alongKm+deltaKm));
  v321ApplySimPosition();
 }
-// V3.6.4: manual simulator jumps are atomic. Pause the animation frame,
-// move exactly the requested distance, refresh navigation/safety once,
-// then resume only if the simulator was running before the tap.
-function v351ManualStep(deltaKm){
- const wasRunning=!!v321Sim.running;
- if(v321Sim.timer)cancelAnimationFrame(v321Sim.timer);
- v321Sim.timer=null;
- v321Sim.running=false;
- v321Sim.lastTs=0;
- v321Sim.active=true;
- v321Step(deltaKm);
- openSimulatorCenter();
- if(wasRunning){
-   v321Sim.running=true;
-   v321Sim.lastTs=0;
-   v321Sim.timer=requestAnimationFrame(v321Tick);
- }
-}
 function v321Tick(ts){
  if(!v321Sim.running)return;
  if(!v321Sim.lastTs)v321Sim.lastTs=ts;
-
- // V3.6.4: do not run the full navigation/map stack at 60 FPS.
- // Five virtual GPS fixes per second are more than enough for walking navigation
- // and leave Safari's main thread free for buttons, modals and scrolling.
- const elapsed=ts-v321Sim.lastTs;
- if(elapsed < 200){
-   v321Sim.timer=requestAnimationFrame(v321Tick);
-   return;
- }
-
- const dt=Math.min(1,elapsed/1000);
+ const dt=(ts-v321Sim.lastTs)/1000;
  v321Sim.lastTs=ts;
  const kmPerSec=v321Sim.speedKmh/3600;
-
  try{
    v321Step(kmPerSec*dt);
  }catch(e){
@@ -679,22 +606,23 @@ function v321Tick(ts){
    v321Sim.alongKm=Math.max(0,Math.min(routeCum?.at(-1)||0,v321Sim.alongKm+kmPerSec*dt));
  }
 
- const total=routeCum?.at(-1)||0;
- if(v321Sim.alongKm >= total-0.001){
-   v321Sim.alongKm=total;
+ const __total=routeCum?.at(-1)||0;
+ if(v321Sim.alongKm >= __total-0.001){
+   v321Sim.alongKm=__total;
    v321ApplySimPosition();
    v321Sim.running=false;
    v321Sim.timer=null;
    return;
  }
 
+ // Passing an instruction must never end the simulator. The next trail hint
+ // is selected from the current along-route position on the following frame.
  if(v30TrailHints?.length){
    const passed=[...v30TrailHints].reverse().find(h=>h.alongKm<=v321Sim.alongKm);
    if(passed && passed.alongKm>v321Sim.lastPassedTurnKm){
      v321Sim.lastPassedTurnKm=passed.alongKm;
    }
  }
-
  v321Sim.timer=requestAnimationFrame(v321Tick);
 }
 function v321Start(){
@@ -706,26 +634,20 @@ function v321Start(){
    v32State.passedTurns=new Set();
    v32State.switchLockUntilKm=0;
  }
- if(v321Sim.timer)cancelAnimationFrame(v321Sim.timer);
- v321Sim.active=true;
- v321Sim.running=true;
- v321Sim.lastTs=0;
+
+ v321Sim.active=true;v321Sim.running=true;v321Sim.lastTs=0;
  v321ApplySimPosition();
  v321Sim.timer=requestAnimationFrame(v321Tick);
- // V3.6.4: simulator runs in background. The modal must not block the
- // Jagd-, Live-, Track- or other top-level controls during a test.
- closeAppModal();
+ openSimulatorCenter();
 }
 function v321Pause(){
  v321Sim.running=false;
  if(v321Sim.timer)cancelAnimationFrame(v321Sim.timer);
  v321Sim.timer=null;
- v321Sim.lastTs=0;
  openSimulatorCenter();
 }
 function v321Reset(){
  v321Pause();
- try{v35ResetAlerts?.()}catch(e){}
  v321Sim.active=false;v321Sim.alongKm=0;v321Sim.offRouteM=0;v321Sim.lastTs=0;v321Sim.lastPassedTurnKm=-1;
  v32State.activeTurnId=null;v32State.lastSpokenTurn=null;v32State.lastPassedTurn=null;v32State.passedTurns=new Set();v32State.switchLockUntilKm=0;
  try{
@@ -734,29 +656,13 @@ function v321Reset(){
  openSimulatorCenter();
 }
 function v321JumpToNextTurn(){
- try{
-   if(!v30TrailHints?.length)v30BuildTrailHints?.();
-   const next=(v30TrailHints||[]).find(h=>Number(h.alongKm)>v321Sim.alongKm+.02);
-   if(!next)return;
-
-   const wasRunning=!!v321Sim.running;
-   if(v321Sim.timer){
-     cancelAnimationFrame(v321Sim.timer);
-     v321Sim.timer=null;
-   }
-
-   v321Sim.alongKm=Math.max(0,Number(next.alongKm)-.12);
-   v321Sim.lastTs=0;
+ if(!v30TrailHints?.length)v30BuildTrailHints?.();
+ const next=(v30TrailHints||[]).find(h=>h.alongKm>v321Sim.alongKm+.02);
+ if(next){
+   v321Sim.alongKm=Math.max(0,next.alongKm-.12);
    v321ApplySimPosition();
-
-   if(wasRunning){
-     v321Sim.running=true;
-     v321Sim.timer=requestAnimationFrame(v321Tick);
-   }
-   openSimulatorCenter();
- }catch(e){
-   console.warn('Sprung zum nächsten Hinweis fehlgeschlagen',e);
  }
+ openSimulatorCenter();
 }
 function v321SetDeviation(m){
  v321Sim.offRouteM=Number(m)||0;
@@ -773,7 +679,7 @@ function v321SimStatus(){
 function openSimulatorCenter(){
  const s=v321SimStatus();
  $('#modalBody').innerHTML=`
- <span class="tag">🧪 Navigations-Simulator · V3.6.4</span><h2>Tour zuhause testen</h2>
+ <span class="tag">🧪 Navigations-Simulator · V3.6.0</span><h2>Tour zuhause testen</h2>
  <div class="simCard">
    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
      <div><h3>${v321Sim.running?'Simulation läuft':v321Sim.active?'Simulation pausiert':'Simulator bereit'}</h3><small>Virtuelle GPS-Position entlang der geladenen GPX-Route.</small></div>
@@ -794,25 +700,23 @@ function openSimulatorCenter(){
      <small>1–8 km/h</small>
    </div>
 
-   <div class="v35SimTest"><div><b>🦌 Jagd-Radar-Test</b><small>${v35TestMode?'Test-Sperrzone ist aktiv. Beim Annähern werden Warnungen ausgelöst.':'Aus – es werden keine simulierten Jagdwarnungen angezeigt.'}</small></div><button type="button" id="simHuntTest" class="toolBtn">${v35TestMode?'Test aus':'Test an'}</button></div>
-
    <div class="simControls">
-     <button type="button" id="simStart" class="primary">${v321Sim.running?'Läuft …':'▶ Simulation starten'}</button>
-     <button type="button" id="simPause" class="toolBtn">⏸ Pause</button>
-     <button type="button" id="simBack" class="toolBtn">−100 m</button>
-     <button type="button" id="simForward" class="toolBtn">+100 m</button>
-     <button type="button" id="simNextTurn" class="toolBtn">↪ Zum nächsten Hinweis</button>
-     <button type="button" id="simReset" class="toolBtn warn">↺ Zurücksetzen</button>
+     <button id="simStart" class="primary">${v321Sim.running?'Läuft …':'▶ Simulation starten'}</button>
+     <button id="simPause" class="toolBtn">⏸ Pause</button>
+     <button id="simBack" class="toolBtn">−100 m</button>
+     <button id="simForward" class="toolBtn">+100 m</button>
+     <button id="simNextTurn" class="toolBtn">↪ Zum nächsten Hinweis</button>
+     <button id="simReset" class="toolBtn warn">↺ Zurücksetzen</button>
    </div>
 
    <div class="simCard">
      <b>Routenabweichung testen</b>
      <small>Setzt die virtuelle Position absichtlich neben die GPX-Linie.</small>
      <div class="simDeviation" style="margin-top:10px">
-       <button type="button" class="toolBtn simDev" data-m="0">0 m</button>
-       <button type="button" class="toolBtn simDev" data-m="50">50 m</button>
-       <button type="button" class="toolBtn simDev" data-m="100">100 m</button>
-       <button type="button" class="toolBtn simDev" data-m="200">200 m</button>
+       <button class="toolBtn simDev" data-m="0">0 m</button>
+       <button class="toolBtn simDev" data-m="50">50 m</button>
+       <button class="toolBtn simDev" data-m="100">100 m</button>
+       <button class="toolBtn simDev" data-m="200">200 m</button>
      </div>
    </div>
 
@@ -820,36 +724,31 @@ function openSimulatorCenter(){
      <b>Hinweise testen</b>
      <small>Ton, Vibration und Sprache verwenden dieselben Einstellungen wie die echte Navigation.</small>
      <div class="simControls" style="margin-top:10px">
-       <button type="button" id="simTurnAlert" class="toolBtn">🔔 Abbiegewarnung</button>
-       <button type="button" id="simOffAlert" class="toolBtn">⚠ Routenwarnung</button>
-       <button type="button" id="simVoice" class="toolBtn">🗣 Sprachansage</button>
-       <button type="button" id="simOpenLive" class="toolBtn">🧭 Live-HUD öffnen</button>
+       <button id="simTurnAlert" class="toolBtn">🔔 Abbiegewarnung</button>
+       <button id="simOffAlert" class="toolBtn">⚠ Routenwarnung</button>
+       <button id="simVoice" class="toolBtn">🗣 Sprachansage</button>
+       <button id="simOpenLive" class="toolBtn">🧭 Live-HUD öffnen</button>
      </div>
    </div>
  </div>`;
- showAppModal();
+ $('#modal').classList.remove('hidden');
 
  $('#simSpeed').oninput=e=>{v321Sim.speedKmh=Number(e.target.value);};
  $('#simStart').onclick=v321Start;
  $('#simPause').onclick=v321Pause;
- $('#simBack').onclick=()=>v351ManualStep(-.1);
- $('#simForward').onclick=()=>v351ManualStep(.1);
+ $('#simBack').onclick=()=>{v321Step(-.1);openSimulatorCenter()};
+ $('#simForward').onclick=()=>{v321Step(.1);openSimulatorCenter()};
  $('#simNextTurn').onclick=v321JumpToNextTurn;
  $('#simReset').onclick=v321Reset;
  document.querySelectorAll('.simDev').forEach(b=>b.onclick=()=>v321SetDeviation(Number(b.dataset.m)));
  $('#simTurnAlert').onclick=()=>v31Notify('turn');
  $('#simOffAlert').onclick=()=>v31Notify('offroute');
- $('#simVoice').onclick=()=>v32Speak('In 50 Metern rechts abbiegen.',true);
- const sht=$('#simHuntTest');if(sht)sht.onclick=(ev)=>{
-   ev.preventDefault();ev.stopPropagation();
-   v35ToggleTestMode();
-   openSimulatorCenter();
- };
+ $('#simVoice').onclick=()=>{const old=v32Settings.voice;v32Settings.voice=true;v32Speak('In 50 Metern rechts abbiegen.');v32Settings.voice=old};
  $('#simOpenLive').onclick=openLiveNavCenter;
 }
 
 
-/* ===== V3.6.4: Tour-Aufzeichnung & Live-Statistik ===== */
+/* ===== V3.6.0: Tour-Aufzeichnung & Live-Statistik ===== */
 const V33_TRACK_KEY='trek_sleep_v33_track';
 const V33_HISTORY_KEY='trek_sleep_v33_history';
 
@@ -1020,7 +919,7 @@ function v33FinishRecording(){
      }
    },0);
  }catch(e){
-   console.error('V3.6.4 save error',e);
+   console.error('V3.6.0 save error',e);
    // Recording data deliberately remains in memory for retry.
    v33Track.recording=false;
    openTrackCenter();
@@ -1045,7 +944,7 @@ function v33TrackGpx(track){
  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
  const name=esc(track?.name||$('#routeName')?.textContent?.trim()||'Trek & Sleep Track');
  const seg=pts.map(p=>`<trkpt lat="${Number(p.lat).toFixed(7)}" lon="${Number(p.lon).toFixed(7)}"><time>${new Date(p.t).toISOString()}</time></trkpt>`).join('');
- return `<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Trek & Sleep V3.6.4" xmlns="http://www.topografix.com/GPX/1/1"><trk><name>${name}</name><trkseg>${seg}</trkseg></trk></gpx>`;
+ return `<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Trek & Sleep V3.6.0" xmlns="http://www.topografix.com/GPX/1/1"><trk><name>${name}</name><trkseg>${seg}</trkseg></trk></gpx>`;
 }
 function v33DownloadGpx(track){
  const xml=v33TrackGpx(track);
@@ -1082,7 +981,7 @@ function openTrackCenter(){
  const canFinish=hasActive || (Array.isArray(v33Track.points) && v33Track.points.length>0);
 
  $('#modalBody').innerHTML=`
- <span class="tag">⏺ Tour-Aufzeichnung · V3.6.4</span><h2>Gelaufenen Track aufzeichnen</h2>
+ <span class="tag">⏺ Tour-Aufzeichnung · V3.6.0</span><h2>Gelaufenen Track aufzeichnen</h2>
  <div class="trackCard ${hasActive?'recording':''}">
    <div class="trackHead">
      <div><b style="font-size:22px">${hasActive?(v33Track.paused?'Aufzeichnung pausiert':'Aufzeichnung läuft'):'Bereit zur Aufzeichnung'}</b><small>${hasActive?`${v33Track.source||'GPS'} wird protokolliert.`:'Funktioniert mit echtem GPS und mit dem Simulator.'}</small></div>
@@ -1095,16 +994,16 @@ function openTrackCenter(){
      <div class="trackMetric"><b>${Math.round(v33Track.maxOffRouteM)} m</b><small>größte Routenabweichung</small></div>
    </div>
    <div class="trackActions">
-     <button type="button" id="v33Start" class="primary">${hasActive?(v33Track.paused?'▶ Fortsetzen':'● Läuft'):'⏺ Aufzeichnung starten'}</button>
-     <button type="button" id="v33Pause" class="toolBtn" ${hasActive?'':'disabled'}>${v33Track.paused?'▶ Fortsetzen':'⏸ Pause'}</button>
-     <button type="button" id="v33Finish" class="toolBtn" ${canFinish?'':'disabled'}>🏁 Beenden & speichern</button>
-     <button type="button" id="v33Reset" class="toolBtn warn">↺ Verwerfen</button>
+     <button id="v33Start" class="primary">${hasActive?(v33Track.paused?'▶ Fortsetzen':'● Läuft'):'⏺ Aufzeichnung starten'}</button>
+     <button id="v33Pause" class="toolBtn" ${hasActive?'':'disabled'}>${v33Track.paused?'▶ Fortsetzen':'⏸ Pause'}</button>
+     <button id="v33Finish" class="toolBtn" ${canFinish?'':'disabled'}>🏁 Beenden & speichern</button>
+     <button id="v33Reset" class="toolBtn warn">↺ Verwerfen</button>
    </div>
  </div>
  <h3 style="margin-top:18px">Gespeicherte Aufzeichnungen</h3>
  ${v33HistoryHtml()}`;
 
- showAppModal();
+ $('#modal').classList.remove('hidden');
 
  $('#v33Start').onclick=v33StartRecording;
  if($('#v33Pause'))$('#v33Pause').onclick=v33PauseRecording;
@@ -1149,7 +1048,7 @@ function v33RestoreRecording(){
 }
 
 
-/* ===== V3.6.4: Jagdzeiten & Sicherheitswarnungen ===== */
+/* ===== V3.6.0: Jagdzeiten & Sicherheitswarnungen ===== */
 const V34_HUNTING_SOURCE='Rheinland-Pfalz §42 LJVO';
 const V34_HUNTING_SOURCE_DATE='Stand der in der App hinterlegten Jagdzeiten: 24.08.2026';
 
@@ -1336,12 +1235,10 @@ function openHuntingCenter(){
          try{open=v34SeasonOpen(x)}catch(e){}
          return `<div class="huntSpeciesRow"><div><b>${escapeHtml(x.name)}</b><small>${escapeHtml(v34SeasonText(x))}${x.note?' · '+escapeHtml(x.note):''}</small></div><span class="huntStatus ${open?'open':'closed'}">${open?'Jagdzeit':'Schonzeit'}</span></div>`;
        }).join('')}</div>`
-     : `<div class="huntNotice"><b>Noch keine Jagdzeiten für diese Region hinterlegt.</b><small>V3.6.4 startet mit Rheinland-Pfalz. Weitere Bundesländer können später ergänzt werden.</small></div>`;
+     : `<div class="huntNotice"><b>Noch keine Jagdzeiten für diese Region hinterlegt.</b><small>V3.6.0 startet mit Rheinland-Pfalz. Weitere Bundesländer können später ergänzt werden.</small></div>`;
 
    body.innerHTML=`
-    <span class="tag">🦌 Jagd & Sicherheit · V3.6.4</span><h2>Jagdhinweise entlang der Tour</h2>
-    ${v35SafetyCardHtml()}
-    <div class="v35Actions"><button id="v35TestToggle" class="toolBtn">${v35TestMode?'🧪 Testwarnung ausschalten':'🧪 Testwarnung aktivieren'}</button><button id="v35MapFocus" class="toolBtn" ${v35TestMode?'':'disabled'}>🗺 Auf Karte anzeigen</button></div>
+    <span class="tag">🦌 Jagd & Sicherheit · V3.6.0</span><h2>Jagdhinweise entlang der Tour</h2>
     <div class="huntHero ${cls}">
       <div class="huntHead">
         <div><b style="font-size:22px">${escapeHtml(a.region?.area||'Tourregion')}</b><small>${escapeHtml(a.region?.state||'Unbekannt')} · Prüfung für ${today}</small></div>
@@ -1373,212 +1270,21 @@ function openHuntingCenter(){
       Quelle der hinterlegten RLP-Jagdzeiten: ${V34_HUNTING_SOURCE}. ${V34_HUNTING_SOURCE_DATE}
     </div>`;
 
-   showAppModal();
-   const tt=$('#v35TestToggle');if(tt)tt.onclick=(ev)=>{
-     ev.preventDefault();ev.stopPropagation();
-     v35ToggleTestMode();
-     openHuntingCenter();
-   };
-   const mf=$('#v35MapFocus');if(mf)mf.onclick=v35FocusHazard;
+   modal.classList.remove('hidden');
  }catch(e){
    console.error('openHuntingCenter failed',e);
    const modal=$('#modal'),body=$('#modalBody');
    if(modal&&body){
-     body.innerHTML=`<span class="tag">🦌 Jagd & Sicherheit · V3.6.4</span><h2>Jagdcenter</h2>
+     body.innerHTML=`<span class="tag">🦌 Jagd & Sicherheit · V3.6.0</span><h2>Jagdcenter</h2>
        <div class="huntNotice danger"><b>⚠ Jagdcenter konnte nicht vollständig geladen werden.</b>
        <small>${escapeHtml(String(e?.message||e))}</small></div>
        <button id="huntRetry" class="primary wide">Erneut laden</button>`;
-     showAppModal();
+     modal.classList.remove('hidden');
      const retry=$('#huntRetry'); if(retry)retry.onclick=openHuntingCenter;
    }else{
      alert('Jagdcenter konnte nicht geöffnet werden: '+String(e?.message||e));
    }
  }
-}
-
-
-/* ===== V3.6.4: Jagd-Radar & streckenbezogene Sicherheitslage ===== */
-const V35_TEST_KEY='trek_sleep_v35_test_radar';
-let v35TestMode=localStorage.getItem(V35_TEST_KEY)==='1';
-let v35ZoneLayer=null;
-let v35AlertState={approach:false,near:false,inside:false,passed:false};
-
-function v35TotalKm(){return Number(routeCum?.at(-1))||0}
-function v35TestHazard(){
- const total=v35TotalKm();
- if(!total||!route?.length)return null;
- const centerKm=Math.min(Math.max(total*.28,.65),Math.max(.65,total-.35));
- const halfKm=Math.min(.16,Math.max(.08,total*.025));
- const p=v321RoutePointAt?.(centerKm);
- if(!p)return null;
- return {id:'v35-test-hunt-zone',test:true,type:'hunting_closure',level:'red',title:'TEST – Jagd/Sperrung',source:'Trek & Sleep Simulator',updated:new Date().toISOString(),centerKm,startKm:Math.max(0,centerKm-halfKm),endKm:Math.min(total,centerKm+halfKm),lat:p.lat,lon:p.lon,radiusM:180,text:'Simulierter Sicherheitsbereich zum Testen von Warnung, Entfernung, Karte und Alarm. Keine reale Jagdmeldung.'};
-}
-function v35CurrentAlong(){
- if(v321Sim?.active)return Number(v321Sim.alongKm)||0;
- const tr=v32GpsTracking?.();
- return tr?Number(tr.alongKm)||0:(v30CurrentAlong?.()||0);
-}
-function v35LevelInfo(code){
- return {red:{icon:'🔴',label:'Bestätigte Sperrung/Jagd',cls:'red'},orange:{icon:'🟠',label:'Konkrete öffentliche Jagdinformation',cls:'orange'},yellow:{icon:'🟡',label:'Jagdzeit aktiv – keine lokale Jagd bestätigt',cls:'yellow'},green:{icon:'🟢',label:'Keine bekannte aktuelle Meldung',cls:'green'}}[code]||{icon:'⚪',label:'Status unbekannt',cls:'unknown'};
-}
-function v35RealBaseAssessment(){
- const a=v34Assessment?.();
- if(a?.region?.supported && Array.isArray(a.open) && a.open.length){
-   return {level:'yellow',title:'Jagdzeiten aktiv',detail:'Es gilt mindestens eine gesetzliche Jagdzeit; eine konkrete lokale Jagd ist damit nicht bestätigt.',source:V34_HUNTING_SOURCE,updated:V34_HUNTING_SOURCE_DATE};
- }
- return {level:'green',title:'Keine bekannte aktuelle Meldung',detail:'Keine bestätigte lokale Jagd oder Sperrung geladen.',source:'Trek & Sleep Sicherheitsprüfung',updated:new Date().toLocaleDateString('de-DE')};
-}
-function v35Status(){
- const base=v35RealBaseAssessment(),hz=v35TestMode?v35TestHazard():null;
- if(!hz)return {...base,test:false,hazard:null,distanceKm:null,inside:false,passed:false};
- const along=v35CurrentAlong(),inside=along>=hz.startKm&&along<=hz.endKm,passed=along>hz.endKm;
- const distanceKm=inside||passed?0:Math.max(0,hz.startKm-along);
- if(!passed)return {level:'red',title:inside?'TEST – Sperrbereich erreicht':'TEST – Sperrbereich voraus',detail:hz.text,source:hz.source,updated:new Date(hz.updated).toLocaleString('de-DE'),test:true,hazard:hz,distanceKm,inside,passed:false};
- return {...base,test:true,hazard:hz,distanceKm:0,inside:false,passed:true};
-}
-function v35FormatDistance(km){if(km==null)return '—';return km<1?`${Math.max(0,Math.round(km*1000))} m`:`${km.toFixed(1)} km`}
-function v35SafetyCardHtml(){
- const st=v35Status(),info=v35LevelInfo(st.level);
- return `<div class="v35SafetyCard ${info.cls}"><div class="v35SafetyHead"><div><b>${info.icon} Sicherheitslage der Tour</b><small>${escapeHtml(st.title)}</small></div><span>${st.test?'TEST':info.label}</span></div>${st.test&&st.hazard&&!st.passed?`<div class="v35Distance"><strong>${st.inside?'STOP':v35FormatDistance(st.distanceKm)}</strong><small>${st.inside?'simulierter Sperrbereich erreicht':'bis zum simulierten Warnbereich'}</small></div>`:''}<div class="v35SafetyText">${escapeHtml(st.detail)}</div><div class="v35Source">Quelle: ${escapeHtml(st.source||'—')} · Stand: ${escapeHtml(st.updated||'—')}</div>${st.test?'<div class="v35TestBadge">SIMULATION – KEINE REALE JAGDMELDUNG</div>':''}</div>`;
-}
-function v35DrawTestZone(){
- try{if(v35ZoneLayer&&map){map.removeLayer(v35ZoneLayer);v35ZoneLayer=null}if(!v35TestMode||!map)return;const hz=v35TestHazard();if(!hz)return;v35ZoneLayer=L.circle([hz.lat,hz.lon],{radius:hz.radiusM,color:'#ff6158',weight:3,fillColor:'#ff6158',fillOpacity:.16,dashArray:'7 7'}).addTo(map);v35ZoneLayer.bindPopup('<b>TEST – Jagd/Sperrung</b><br>Nur Simulator-Test, keine reale Meldung.')}catch(e){console.warn('v35DrawTestZone',e)}
-}
-function v35FocusHazard(){const hz=v35TestHazard();if(!hz||!map)return;v35DrawTestZone();map.setView([hz.lat,hz.lon],15);if(v35ZoneLayer)v35ZoneLayer.openPopup()}
-function v35Signal(kind){try{if(kind==='approach'){v31Vibrate?.([100,70,100]);v31Beep?.(690,.15)}if(kind==='near'){v31Vibrate?.([170,70,170]);v31Beep?.(560,.2)}if(kind==='inside'){v31Vibrate?.([300,100,300,100,300]);v31Beep?.(390,.3)}}catch(e){}}
-function v35UpdateSafety(){
- const st=v35Status();
-
- // Ensure the test geofence remains present after Leaflet redraws/layer changes.
- if(v35TestMode && !v35ZoneLayer){
-   try{v35DrawTestZone()}catch(e){}
- }
-
- if(st.test&&st.hazard&&!st.passed){
-   const m=(st.distanceKm||0)*1000;
-   if(!st.inside&&m<=500&&!v35AlertState.approach){v35AlertState.approach=true;v35Signal('approach')}
-   if(!st.inside&&m<=150&&!v35AlertState.near){v35AlertState.near=true;v35Signal('near')}
-   if(st.inside&&!v35AlertState.inside){v35AlertState.inside=true;v35Signal('inside')}
-   v35AlertState.passed=false;
- }else if(st.test&&st.passed){
-   v35AlertState.passed=true;
- }
- v35InjectHud();
-}
-function v35HudHtml(){
- const st=v35Status(),info=v35LevelInfo(st.level);if(st.level==='green'&&!st.test)return '';let right='';if(st.test&&st.hazard&&!st.passed)right=st.inside?'STOP':v35FormatDistance(st.distanceKm);else if(st.level==='yellow')right='Jagdzeit';return `<div class="v35Hud ${info.cls}" onclick="openHuntingCenter()"><div><b>${info.icon} ${escapeHtml(st.title)}</b><small>${st.test?'TESTMODUS · ':''}${escapeHtml(st.source||'Sicherheitsprüfung')}</small></div><strong>${right}</strong></div>`;
-}
-function v35InjectHud(){const host=$('#mapTourStatusHost');if(!host)return;const old=host.querySelector('.v35Hud'),html=v35HudHtml();if(!html){if(old)old.remove();return}if(old)old.outerHTML=html;else host.insertAdjacentHTML('afterbegin',html)}
-function v35SetTestMode(next){
- v35TestMode=!!next;
- try{localStorage.setItem(V35_TEST_KEY,v35TestMode?'1':'0')}catch(e){console.warn('Jagd-Teststatus konnte nicht gespeichert werden',e)}
- v35AlertState={approach:false,near:false,inside:false,passed:false};
- try{v35DrawTestZone()}catch(e){console.warn('Jagd-Testzone',e)}
- try{v35UpdateSafety()}catch(e){console.warn('Jagd-Teststatus',e)}
- return v35TestMode;
-}
-function v35ToggleTestMode(){return v35SetTestMode(!v35TestMode)}
-function v35ResetAlerts(){v35AlertState={approach:false,near:false,inside:false,passed:false}}
-
-
-function closeAppModal(){
- const modal=$('#modal');
- if(!modal)return;
- modal.classList.add('hidden');
- modal.setAttribute('aria-hidden','true');
- document.body.classList.remove('modalOpen');
-}
-function showAppModal(){
- const modal=$('#modal');
- if(!modal)return;
- modal.classList.remove('hidden');
- modal.setAttribute('aria-hidden','false');
- document.body.classList.add('modalOpen');
- setTimeout(()=>{try{bindModalSafety()}catch(e){}},0);
-}
-function bindModalSafety(){
- const modal=$('#modal'),close=$('#closeModal'),sheet=modal?.querySelector('.sheet');
- if(close && !close.dataset.v363Bound){
-   close.dataset.v363Bound='1';
-   close.type='button';
-   close.addEventListener('click',(ev)=>{
-     ev.preventDefault();ev.stopPropagation();closeAppModal();
-   });
- }
- if(modal && !modal.dataset.v363Bound){
-   modal.dataset.v363Bound='1';
-   modal.addEventListener('click',(ev)=>{
-     if(ev.target===modal)closeAppModal();
-   });
- }
- // iPhone bottom-sheet gesture: only starts at the top of an unscrolled sheet.
- if(sheet && !sheet.dataset.v363Swipe){
-   sheet.dataset.v363Swipe='1';
-   let startY=null,startX=null;
-   sheet.addEventListener('touchstart',(ev)=>{
-     const t=ev.touches?.[0];
-     if(!t || sheet.scrollTop>2 || t.clientY>sheet.getBoundingClientRect().top+90){
-       startY=null;startX=null;return;
-     }
-     startY=t.clientY;startX=t.clientX;
-   },{passive:true});
-   sheet.addEventListener('touchend',(ev)=>{
-     if(startY==null)return;
-     const t=ev.changedTouches?.[0];
-     if(t){
-       const dy=t.clientY-startY,dx=Math.abs(t.clientX-startX);
-       if(dy>85 && dx<70)closeAppModal();
-     }
-     startY=null;startX=null;
-   },{passive:true});
- }
-}
-function v36UiHealth(){
- const modal=$('#modal');
- if(modal?.classList.contains('hidden')){
-   modal.setAttribute('aria-hidden','true');
-   document.body.classList.remove('modalOpen');
- }
- // Reattach the test zone only if it is supposed to be visible.
- if(v35TestMode && map && !v35ZoneLayer){
-   try{v35DrawTestZone()}catch(e){}
- }
-
- try{bindTopActionSafety()}catch(e){}
-}
-
-function bindTopActionSafety(){
- const bar=document.querySelector('.filters');
- if(!bar || bar.dataset.v363Bound)return;
- bar.dataset.v363Bound='1';
- const handlers={
-  paceBtn:openPaceSettings,
-  plannerBtn:openTourPlanner,
-  mapPlanBtn:openMapPlanner,
-  navStartBtn:toggleNavigationSession,
-  elevationBtn:openElevationProfile,
-  tourOverviewBtn:openTourOverview,
-  cockpitBtn:openTourCockpit,
-  trailGuideBtn:openTrailGuide,
-  dayPlanBtn:openDayStagePlanner,
-  navAssistBtn:openNavAssistSettings,
-  liveNavBtn:openLiveNavCenter,
-  simBtn:openSimulatorCenter,
-  trackBtn:openTrackCenter,
-  huntBtn:openHuntingCenter,
-  hazardLayerBtn:toggleHazardLayers
- };
- // Capture only repairs a missing/overwritten onclick. Existing working
- // buttons still use their original handler and are not fired twice.
- bar.addEventListener('click',(ev)=>{
-   const btn=ev.target?.closest?.('button');
-   if(!btn || !bar.contains(btn))return;
-   const fn=handlers[btn.id];
-   if(!fn)return;
-   if(typeof btn.onclick==='function')return;
-   ev.preventDefault();
-   fn(ev);
- },true);
 }
 
 function bind(){
@@ -1598,7 +1304,7 @@ function bind(){
  $('#liveNavBtn').onclick=openLiveNavCenter;
  $('#simBtn').onclick=openSimulatorCenter;
  $('#trackBtn').onclick=openTrackCenter;
- const huntBtn=$('#huntBtn');if(huntBtn)huntBtn.onclick=openHuntingCenter;
+ $('#huntBtn').onclick=openHuntingCenter;
  setNavigationButton();
  if(localStorage.getItem('trek_sleep_plan_v20')) $('#plannerBtn').textContent='🗓 geplant';
  $('#paceBtn').textContent=`🚶 ${hikingSpeedKmh.toFixed(1).replace('.',',')} km/h`;
@@ -1607,7 +1313,7 @@ function bind(){
  $('#gpxInput').onchange=importGPX;
  $('#loadPoisBtn').onclick=()=>loadPois(false);
  $('#refreshBtn').onclick=()=>loadPois(true);
- bindModalSafety();
+ $('#closeModal').onclick=()=>$('#modal').classList.add('hidden');
 
  $$('[data-filter].chip').forEach(b=>b.onclick=()=>{
    filter=b.dataset.filter;
@@ -1626,12 +1332,11 @@ function bind(){
  $('#legalInfoBtn').onclick=openLegalOverview;
 
  $('#moreNav').onclick=openV28Tools;
- bindTopActionSafety();
 }
 
 function info(title,text){
  $('#modalBody').innerHTML=`<span class="tag">TREK & SLEEP</span><h2>${title}</h2><p>${text}</p>`;
- showAppModal();
+ $('#modal').classList.remove('hidden');
 }
 
 function setRoute(points,name,save=true,elevations=null){
@@ -1788,7 +1493,7 @@ function locate(){
 }
 
 
-/* ===== V3.6.4 runtime-safe GPS/navigation helpers ===== */
+/* ===== V3.6.0 runtime-safe GPS/navigation helpers ===== */
 function finiteNumber(v){
  const n=Number(v);
  return Number.isFinite(n)?n:null;
@@ -2143,7 +1848,7 @@ function angleDiff(a,b){
  return d;
 }
 function updateTurnInstruction(){
- // V3.6.4: Abbiegehinweise nur bei einer wirklich aktiven Live-Tour anzeigen.
+ // V3.6.0: Abbiegehinweise nur bei einer wirklich aktiven Live-Tour anzeigen.
  // Im Leerlauf, während GPS noch bestimmt wird und im Vor-Tour-/Anreisemodus bleibt die Karte frei.
  if(!navLiveMode()){$('#turnCard').classList.add('hidden');return;}
  if(!userPosition||route.length<3){
@@ -2780,7 +2485,7 @@ function mapPlanListHtml(){
  }).join('')}</div>`;
 }
 function openMapPlanner(){
- $('#modalBody').innerHTML=`<span class="tag">📍 Kartenplanung · V3.6.4</span>
+ $('#modalBody').innerHTML=`<span class="tag">📍 Kartenplanung · V3.6.0</span>
  <h2>Start, Stopps und Ziel</h2>
  <div class="mapPlanInfo">Wähle unten einen Punkttyp, schließe das Fenster und tippe auf die Karte. Der Punkt rastet auf die vorhandene GPX-Route ein.</div>
  <div class="mapPlanToolbar">
@@ -2793,11 +2498,11 @@ function openMapPlanner(){
  ${mapPlanValidationHtml()}
  <div class="mapPlanSummary"><b>${mapPlan.points.length} Planungspunkte</b><small>${mapPlanMetrics().valid ? mapPlanMetrics().distance.toFixed(1)+' km · '+stageTotalPause()+' Min. Stopppausen' : 'Setze Start und Ziel, um die tatsächliche GPX-Tourdistanz zu berechnen.'}</small></div>
  <button id="saveMapPlanBtn" class="mapPlanSave" ${mapPlanMetrics().valid?'':'disabled'}>Plan auf Karte übernehmen</button>`;
- showAppModal();
+ $('#modal').classList.remove('hidden');
 
  $$('[data-mapmode]').forEach(b=>b.onclick=()=>{
    mapPlanMode=b.dataset.mapmode;
-   closeAppModal();
+   $('#modal').classList.add('hidden');
    $('#mapPlanBtn').textContent=`📍 ${pointLabel(mapPlanMode)} setzen`;
    $('#mapPlanBtn').classList.add('active');
  });
@@ -2821,7 +2526,7 @@ function openMapPlanner(){
    $('#mapPlanBtn').classList.remove('active');
    navigationSession={active:false,startedAt:null};
  navigationModeState={mode:'idle',distanceToStartKm:null,lastStableAt:Date.now(),lastGpsAt:navigationModeState.lastGpsAt||0};saveNavigationSession();setNavigationButton();
-   closeAppModal();
+   $('#modal').classList.add('hidden');
    await refreshWarnings();
  };
 }
@@ -2994,7 +2699,7 @@ function startNavigationSession(){
  }
  navigationSession={active:true,startedAt:new Date().toISOString()};
  navigationModeState={mode:'gps_pending',distanceToStartKm:null,lastStableAt:Date.now(),lastGpsAt:0};
- // V3.6.4 starts in Vor-Tour mode until GPS is close enough to the planned start.
+ // V3.6.0 starts in Vor-Tour mode until GPS is close enough to the planned start.
  liveNavState={activeStageIndex:0,reachedStops:{},completed:false};
  saveNavigationSession();setNavigationButton();renderMapTourStatus();
 }
@@ -3245,7 +2950,6 @@ function compactMapTourStatusHtml(){
 }
 
 function renderMapTourStatus(){
- setTimeout(()=>{try{v35InjectHud()}catch(e){}},0);
  setTimeout(()=>{try{v34InjectHud()}catch(e){}},0);
  setTimeout(()=>{try{v33InjectTrackHud()}catch(e){}},0);
  setTimeout(()=>{try{v32UpdateEngine();v32InjectHud()}catch(e){}},0);
@@ -3324,7 +3028,7 @@ function stagePlannerHtml(stages){
 
 
 
-/* ===== V3.6.4: Trail-Navigation, Etappenplan, Offline-Tourpaket ===== */
+/* ===== V3.6.0: Trail-Navigation, Etappenplan, Offline-Tourpaket ===== */
 const V30_OFFLINE_KEY='trek_sleep_v30_offline_packages';
 let v30TrailHints=[];
 
@@ -3376,7 +3080,7 @@ function v30FormatDistKm(km){return km<1?`${Math.max(0,Math.round(km*1000))} m`:
 function openTrailGuide(){
  const hints=v30NextTrailHints(8),along=v30CurrentAlong(),total=routeCum?.at(-1)||0;
  $('#modalBody').innerHTML=`
- <span class="tag">🧭 Trail-Navigation · V3.6.4</span><h2>Abbiegehinweise</h2>
+ <span class="tag">🧭 Trail-Navigation · V3.6.0</span><h2>Abbiegehinweise</h2>
  <div class="trailHero"><div class="trailTop"><div><h3>${navigationSession?.active?'Navigation aktiv':'Vorschau der Route'}</h3>
  <small>Hinweise werden aus der Form deiner GPX-Strecke abgeleitet.</small></div><span class="trailBadge">${v30TrailHints.length} Hinweise</span></div>
  <div class="cockpitGrid"><div class="cockpitMetric"><b>${along.toFixed(1)} km</b><small>Fortschritt</small></div>
@@ -3384,7 +3088,7 @@ function openTrailGuide(){
  ${hints.length?hints.map(h=>`<div class="turnCard"><div class="turnIcon">${h.icon}</div><div><b>${escapeHtml(h.label)}</b><small>bei km ${h.alongKm.toFixed(1)}</small></div><div class="turnDist">${v30FormatDistKm(Math.max(0,h.alongKm-along))}</div></div>`).join(''):
  '<div class="card"><b>Keine markanten Richtungsänderungen gefunden.</b><p>Die Strecke verläuft hier überwiegend gerade oder enthält zu wenige Punkte.</p></div>'}
  <div class="card"><small>Die Hinweise werden geometrisch aus der GPX-Linie erzeugt und ersetzen keine ausgeschilderte Wegführung.</small></div>`;
- showAppModal();
+ $('#modal').classList.remove('hidden');
 }
 
 function v30PoisForSegment(a,b){
@@ -3418,7 +3122,7 @@ function openDayStagePlanner(){
    stages.push({a,b,distance:b-a,pois,st,pauseMin});
  }
  $('#modalBody').innerHTML=`
- <span class="tag">🗓 Etappenplan · V3.6.4</span><h2>Deine Tour in Abschnitten</h2>
+ <span class="tag">🗓 Etappenplan · V3.6.0</span><h2>Deine Tour in Abschnitten</h2>
  <div class="dayHero"><div class="dayTop"><div><h3>${stages.length} Etappen</h3><small>Aus Start, Zwischenstopps und Ziel berechnet.</small></div><span class="dayBadge">${total.toFixed(1)} km GPX</span></div></div>
  ${stages.map((s,i)=>`<div class="stageCard"><h3>Etappe ${i+1} · ${s.distance.toFixed(1)} km</h3><div class="stageMeta">GPX km ${s.a.toFixed(1)} → ${s.b.toFixed(1)}</div>
  <div class="stageGrid"><div class="stageMetric"><b>${v30StageETA(s.distance,s.pauseMin)}</b><small>geschätzte Dauer</small></div>
@@ -3426,7 +3130,7 @@ function openDayStagePlanner(){
  <div class="stageMetric"><b>${s.pauseMin||0} Min.</b><small>Pause am Ende</small></div></div><div class="poiStrip">${v30StagePoiPills(s.pois)}</div></div>`).join('')||
  '<div class="card"><b>Noch kein vollständiger Tourplan.</b><p>Setze Start und Ziel unter „Punkte planen“.</p></div>'}
  <div class="card"><b>Mehrtagestour</b><p>Setze Zwischenstopps auf Trekking-, Biwak- oder Hüttenplätze. Trek & Sleep teilt die Route dann automatisch in Tagesabschnitte.</p></div>`;
- showAppModal();
+ $('#modal').classList.remove('hidden');
 }
 
 function v30OfflinePackages(){try{return JSON.parse(localStorage.getItem(V30_OFFLINE_KEY)||'{}')}catch(e){return{}}}
@@ -3455,7 +3159,7 @@ async function prepareOfflineTour(){
 function openOfflineTourCenter(){
  const key=v30OfflineKey(),packs=v30OfflinePackages(),hit=key?packs[key]:null,size=hit?JSON.stringify(hit).length:0;
  $('#modalBody').innerHTML=`
- <span class="tag">📥 Offline-Tour · V3.6.4</span><h2>Tour für unterwegs vorbereiten</h2>
+ <span class="tag">📥 Offline-Tour · V3.6.0</span><h2>Tour für unterwegs vorbereiten</h2>
  <div class="offlineHero"><h3>${hit?'✓ Tourpaket vorhanden':'Noch nicht vorbereitet'}</h3><p>${hit?'Route, Planung, POIs und Höhenprofil wurden lokal gespeichert.':'Speichert die relevanten Daten dieser Tour lokal auf deinem iPhone.'}</p>
  ${hit?`<div class="offlineStatus"><b>${new Date(hit.savedAt).toLocaleString()}</b><small>${Math.round(size/1024)} KB Tourdaten · ${hit.pois?.length||0} POIs</small></div>`:''}</div>
  <div id="offlineV30Progress" class="offlineStatus" style="display:none"><b id="offlineV30Text">Vorbereitung …</b><small>Bitte Seite geöffnet lassen.</small><div class="offlineProgress"><span id="offlineV30Bar"></span></div></div>
@@ -3465,7 +3169,7 @@ function openOfflineTourCenter(){
  <div class="offlineItem"><div><b>Höhenprofil</b><small>berechnete Höhenwerte</small></div><strong>${usableElevationData(routeEle)?'bereit':'fehlt'}</strong></div>
  <div class="offlineItem"><div><b>POIs</b><small>für die aktuelle Route</small></div><strong>${allPois?.length||0}</strong></div>
  <div class="offlineItem"><div><b>Basiskarte</b><small>Browser-Cache, nicht vollständig garantiert</small></div><strong>best effort</strong></div></div>`;
- showAppModal();
+ $('#modal').classList.remove('hidden');
  $('#prepareOfflineV30').onclick=prepareOfflineTour;
  if($('#removeOfflineV30'))$('#removeOfflineV30').onclick=()=>{const p=v30OfflinePackages();delete p[key];v30SaveOfflinePackages(p);openOfflineTourCenter()};
 }
@@ -3473,7 +3177,7 @@ function v30UpdateNavHintBar(){
  const bar=$('#v30NavHintBar');
  if(!bar)return;
 
- // V3.6.4: niemals im Vor-Tour-/Anreisemodus anzeigen.
+ // V3.6.0: niemals im Vor-Tour-/Anreisemodus anzeigen.
  const liveActive = !!navigationSession?.active && !!(typeof navLiveMode==='function' && navLiveMode());
  if(!liveActive){
    bar.classList.remove('show');
@@ -3520,7 +3224,7 @@ function v30UpdateNavHintBar(){
  bar.classList.add('show');
 }
 
-/* ===== V3.6.4: echtes Höhenprofil ===== */
+/* ===== V3.6.0: echtes Höhenprofil ===== */
 const V29_ELEV_CACHE='trek_sleep_v29_elevation_cache';
 let elevationDataSource='none';
 
@@ -3652,7 +3356,7 @@ async function ensureElevationData(force=false){
    }catch(e){}
    return true;
  }catch(e){
-   console.warn('V3.6.4 Höhenprofil:',e);
+   console.warn('V3.6.0 Höhenprofil:',e);
    return false;
  }
 }
@@ -3742,15 +3446,15 @@ function stageElevationHtml(){
  }).join('');
 }
 async function openElevationProfile(){
- $('#modalBody').innerHTML=`<span class="tag">⛰ Höhenprofil · V3.6.4</span><h2>Höhenprofil</h2>
+ $('#modalBody').innerHTML=`<span class="tag">⛰ Höhenprofil · V3.6.0</span><h2>Höhenprofil</h2>
  <div class="profileMissing">Höhendaten werden geprüft …</div>`;
- showAppModal();
+ $('#modal').classList.remove('hidden');
 
  const ready=await ensureElevationData(false);
  const diff=routeDifficulty();
 
  if(!ready || !hasElevationData()){
-   $('#modalBody').innerHTML=`<span class="tag">⛰ Höhenprofil · V3.6.4</span><h2>Höhenprofil</h2>
+   $('#modalBody').innerHTML=`<span class="tag">⛰ Höhenprofil · V3.6.0</span><h2>Höhenprofil</h2>
    <div class="profileMissing">
      Diese GPX-Datei enthält keine ausreichenden Höhenwerte und es konnten gerade keine Höhendaten nachgeladen werden.
      ${navigator.onLine?'Du kannst die Abfrage erneut versuchen.':'Du bist aktuell offline.'}
@@ -3767,7 +3471,7 @@ async function openElevationProfile(){
  const m=mapPlanMetrics();
  const st=elevationStatsBetween(m.valid?m.startP.alongKm:0,m.valid?m.finishP.alongKm:null);
 
- $('#modalBody').innerHTML=`<span class="tag">⛰ Höhenprofil · V3.6.4</span><h2>Tourprofil</h2>
+ $('#modalBody').innerHTML=`<span class="tag">⛰ Höhenprofil · V3.6.0</span><h2>Tourprofil</h2>
  <div class="elevHero">
    <div class="pills"><span class="pill ok">${escapeHtml(elevationSourceLabel())}</span></div>
    <span class="gradeTag ${diff.cls}">${diff.label}</span>
@@ -3858,7 +3562,7 @@ function tourCheckData(){
 }
 function openTourOverview(){
  const d=tourCheckData();
- $('#modalBody').innerHTML=`<span class="tag">🧭 Tour-Check · V3.6.4</span><h2>Tour-Zusammenfassung</h2>
+ $('#modalBody').innerHTML=`<span class="tag">🧭 Tour-Check · V3.6.0</span><h2>Tour-Zusammenfassung</h2>
  <div class="tourCheckHero">
    <div class="tourCheckScore"><div><b>Vorbereitung</b><small>${d.readiness>=85?'sehr gut':d.readiness>=70?'gut':'noch ergänzen'}</small></div><strong>${d.readiness}%</strong></div>
    <div class="tourCheckCards">
@@ -3875,7 +3579,7 @@ function openTourOverview(){
  <div class="tourCheckSection"><h3>🌦 Sicherheit</h3><p>${d.weatherOk?'Aktuell keine passende amtliche DWD-Warnung für den erkannten Tourbereich.':'Es liegen passende Warnhinweise vor. Öffne vor dem Start das Sicherheitscenter.'}</p></div>
  ${supplyAssessmentHtml()}
  ${stageElevationHtml()}`;
- showAppModal();
+ $('#modal').classList.remove('hidden');
 }
 
 function openTourPlanner(){
@@ -3889,14 +3593,14 @@ function openTourPlanner(){
  </div>
  <div class="planSummary"><b>${mapPlanMetrics().valid?mapPlanMetrics().distance.toFixed(1):(routeCum.at(-1)||0).toFixed(1)} km · ca. ${t.totalH.toFixed(1)} Std.</b><small>${mapPlanMetrics().valid?stageTotalPause()+' Min. Pause aus Kartenstopps':Number(tourPlan.pauseMinutes||0)+' Min. Gesamtpause'}</small><small>${mapPlan.points.length?mapPlan.points.length+" Kartenpunkte geplant":"Noch keine Kartenpunkte geplant"}</small><small>Diese Zeiten steuern Wetter- und Sicherheitsprognose.</small>${plannerTimelineHtml()}</div>
  <button id="savePlan" class="savePlanBtn">Plan übernehmen</button>`;
- showAppModal();
+ $('#modal').classList.remove('hidden');
  $('#savePlan').onclick=async()=>{
    const val=$('#planStart').value;
    const d=val?new Date(val):new Date();
    tourPlan={startTime:d.toISOString(),speed:Number($('#planSpeed').value||4),pauseMinutes:Number($('#planPause').value||0),pauseAtHalf:$('#planHalf').value==='1'};
    hikingSpeedKmh=tourPlan.speed;localStorage.setItem('trek_sleep_speed',hikingSpeedKmh);saveTourPlanLocal();
    $('#paceBtn').textContent=`🚶 ${hikingSpeedKmh.toFixed(1).replace('.',',')} km/h`;
-   $('#plannerBtn').textContent='🗓 geplant';closeAppModal();await refreshWarnings();
+   $('#plannerBtn').textContent='🗓 geplant';$('#modal').classList.add('hidden');await refreshWarnings();
  };
 }
 
@@ -3908,12 +3612,12 @@ function openPaceSettings(){
   ${[3,4,5,6].map(v=>`<button class="${Math.abs(hikingSpeedKmh-v)<0.1?'active':''}" data-speed="${v}">${v} km/h</button>`).join('')}
  </div>
  <div class="warning">Die Zeit ist eine Schätzung ohne Pausen und Höhenprofil. Später kann Trek & Sleep deine echte Gehgeschwindigkeit und Höhenmeter automatisch berücksichtigen.</div>`;
- showAppModal();
+ $('#modal').classList.remove('hidden');
  $$('.paceGrid button').forEach(b=>b.onclick=async()=>{
    hikingSpeedKmh=Number(b.dataset.speed);
    localStorage.setItem('trek_sleep_speed',hikingSpeedKmh);
    $('#paceBtn').textContent=`🚶 ${hikingSpeedKmh.toFixed(1).replace('.',',')} km/h`;
-   closeAppModal();
+   $('#modal').classList.add('hidden');
    await refreshWarnings();
  });
 }
@@ -4266,7 +3970,7 @@ function openWarningCenter(){
  <div class="warningCenter">${weatherHtml}${dwdHtml||'<div class="warningCard ok"><div class="warningTitle"><div><b>✓ Keine relevante DWD-Warnung</b><small>für den erkannten Tourbereich</small></div><span class="warningLevel">OK</span></div></div>'}${hazardHtml}${regionalFireCardHtml()}</div>
  <div class="warning">DWD-Wetterwarnungen werden mit einem strengen Kreis-/Ortsabgleich auf den Tourbereich gefiltert. Die Waldbrandlage wird in V2.4.1 flächenbezogen entlang der GPX-Route bewertet und klar zwischen amtlicher WBI-Stufe, amtlicher Landesregel und nichtamtlicher Wettertendenz getrennt. Der Waldbrandgefahrenindex wird aus aktuellen DWD-Indexdaten regional zur GPX-Route zugeordnet. Weit entfernte Stationen werden nicht als lokal verwendet. Der WBI beschreibt das meteorologische Gefahrenpotenzial; örtliche Behörden können abweichende Regeln oder Warnstufen festlegen.</div>
  <button id="refreshWarningModal" class="refreshWarnings">Warnungen aktualisieren</button>`;
- showAppModal();
+ $('#modal').classList.remove('hidden');
  $('#refreshWarningModal').onclick=async()=>{await refreshWarnings();openWarningCenter()};
  if($('#regionalFireSource')&&regionalFire){
    $('#regionalFireSource').onclick=()=>window.open(regionalFire.url,'_blank');
@@ -4537,7 +4241,7 @@ function showPoi(p){
  ${extra}
  <div class="source">${p.type==='legal'?'Quelle: Demo-Rechtsdatensatz':'Quelle: OpenStreetMap · OSM-ID '+escapeHtml(p.id)}</div>`;
 
- showAppModal();
+ $('#modal').classList.remove('hidden');
 }
 
 
@@ -4576,8 +4280,8 @@ function saveTours(x){
 
 async function saveCurrentTour(){
  if(!route.length)return;
- $('#modalBody').innerHTML=`<div class="savingOverlay"><span class="tag">📥 Offline · V3.6.4</span><h2>Tour wird vorbereitet</h2><b>POIs werden automatisch gesichert …</b><span class="muted">Du musst „POIs laden“ vorher nicht mehr antippen.</span></div>`;
- showAppModal();
+ $('#modalBody').innerHTML=`<div class="savingOverlay"><span class="tag">📥 Offline · V3.6.0</span><h2>Tour wird vorbereitet</h2><b>POIs werden automatisch gesichert …</b><span class="muted">Du musst „POIs laden“ vorher nicht mehr antippen.</span></div>`;
+ $('#modal').classList.remove('hidden');
 
  let offlinePois=[];
  try{offlinePois=await ensurePoisForOffline()}catch(e){offlinePois=[]}
@@ -4611,7 +4315,7 @@ async function saveCurrentTour(){
  $('#saveTourBtn').textContent='♥';
 
  const pct=offlinePois.length?100:75;
- $('#modalBody').innerHTML=`<span class="tag">✓ Offline gespeichert · V3.6.4</span>
+ $('#modalBody').innerHTML=`<span class="tag">✓ Offline gespeichert · V3.6.0</span>
  <h2>${escapeHtml(name)}</h2>
  <div class="offlineCheck">
    <div class="offlineCheckTitle"><span>Offline-Bereitschaft</span><strong class="${offlinePois.length?'offlineReady':'offlineWarn'}">${pct}%</strong></div>
@@ -4626,12 +4330,12 @@ async function saveCurrentTour(){
    <span>✚ Rettung <b>${stats.emergency}</b></span>
    <span>⚖ Recht <b>${stats.legal}</b></span>
  </div>
- <div class="warning">Kartenkacheln bleiben weiterhin ausgenommen. V3.6.4 speichert Route, POIs, Rechtsdaten und App-Oberfläche offline.</div>`;
+ <div class="warning">Kartenkacheln bleiben weiterhin ausgenommen. V3.6.0 speichert Route, POIs, Rechtsdaten und App-Oberfläche offline.</div>`;
 }
 
 function openTourLibrary(){
  const tours=savedTours();
- $('#modalBody').innerHTML=`<span class="tag">↗ Touren · V3.6.4</span><h2>Meine Touren</h2>
+ $('#modalBody').innerHTML=`<span class="tag">↗ Touren · V3.6.0</span><h2>Meine Touren</h2>
  ${tours.length?tours.map(t=>{
    const ready=(t.points?.length&&t.pois?.length)?'✓ Offline bereit':'◐ Offline teilweise';
    const cls=(t.points?.length&&t.pois?.length)?'offlineBadge':'offlineBadge partial';
@@ -4654,7 +4358,7 @@ function openTourLibrary(){
  }).join(''):'<div class="empty">Noch keine Tour gespeichert. Öffne eine GPX-Datei und tippe auf ♡.</div>'}
  <div class="warning">V1.7 sichert beim Speichern automatisch die POIs entlang der Route. Ein vorheriges manuelles Laden ist nicht mehr nötig.</div>`;
 
- showAppModal();
+ $('#modal').classList.remove('hidden');
  $$('.openTour').forEach(b=>b.onclick=()=>loadSavedTour(b.dataset.id));
  $$('.offlineTour').forEach(b=>b.onclick=()=>openOfflineManager(b.dataset.id));
  $$('.deleteTour').forEach(b=>b.onclick=()=>deleteSavedTour(b.dataset.id));
@@ -4677,7 +4381,7 @@ function loadSavedTour(id){
    updateNavigationStatus();
  }
 
- closeAppModal();
+ $('#modal').classList.add('hidden');
  $('#saveTourBtn').textContent='♥';
 }
 
@@ -4729,7 +4433,7 @@ function openOfflineManager(id){
  const pct=Math.round((passed/4)*100);
  const stats=t.poiStats||poiStats(t.pois||[]);
 
- $('#modalBody').innerHTML=`<span class="tag">📥 Offline · V3.6.4</span>
+ $('#modalBody').innerHTML=`<span class="tag">📥 Offline · V3.6.0</span>
  <h2>${escapeHtml(t.name)}</h2>
 
  <div class="offlineCheck">
@@ -4758,9 +4462,9 @@ function openOfflineManager(id){
  <button id="prepareOffline" class="prepareBtn">Offline-Daten aktualisieren</button>
  <button id="testOffline" class="testBtn">Gespeicherte Daten testen</button>
 
- <div class="warning">V3.6.4 speichert POIs jetzt automatisch mit der Tour. Die eigentliche Kartenfläche benötigt für einen vollständigen Offline-Modus später eine Kartenquelle, die Offline-Pakete ausdrücklich erlaubt.</div>`;
+ <div class="warning">V3.6.0 speichert POIs jetzt automatisch mit der Tour. Die eigentliche Kartenfläche benötigt für einen vollständigen Offline-Modus später eine Kartenquelle, die Offline-Pakete ausdrücklich erlaubt.</div>`;
 
- showAppModal();
+ $('#modal').classList.remove('hidden');
 
  $('#prepareOffline').onclick=async()=>{
    $('#prepareOffline').textContent='POIs werden geladen …';
@@ -4792,7 +4496,7 @@ function setSheet(mode){
 
 function openNavigationSettings(){
  $('#modalBody').innerHTML=`
- <span class="tag">🧭 Navigation · V3.6.4</span>
+ <span class="tag">🧭 Navigation · V3.6.0</span>
  <h2>Tourführung</h2>
  <div class="priorityBox">
    <div class="priorityRow"><span>Warnung „Route verlassen“</span><b>${NAV_PREFS.offRouteWarnM} m</b></div>
@@ -4800,13 +4504,13 @@ function openNavigationSettings(){
    <div class="priorityRow"><span>Schlafplatz-Hinweis</span><b>${NAV_PREFS.sleepWarnKm} km</b></div>
    <div class="priorityRow"><span>Wichtige Punkte voraus</span><b>${NAV_PREFS.importantWithinKm} km</b></div>
  </div>
- <div class="warning">V3.6.4 bietet GPS-basierte Tourführung und Warnungen, aber noch keine sprachgeführte Abbiege-Navigation. Sie folgt weiterhin dem importierten GPX-Track.</div>`;
- showAppModal();
+ <div class="warning">V3.6.0 bietet GPS-basierte Tourführung und Warnungen, aber noch keine sprachgeführte Abbiege-Navigation. Sie folgt weiterhin dem importierten GPX-Track.</div>`;
+ $('#modal').classList.remove('hidden');
 }
 
 function openLegalOverview(){
  $('#modalBody').innerHTML=`
- <span class="tag">⚖ Rechts-Layer · V3.6.4</span>
+ <span class="tag">⚖ Rechts-Layer · V3.6.0</span>
  <h2>Pfälzerwald</h2>
  <div class="zoneBadge">Rheinland-Pfalz · Quellenstand 22.08.2026</div>
  <div class="legalBox">
@@ -4819,11 +4523,11 @@ function openLegalOverview(){
  </div>
  <div class="warning">Die regionalen Grundregeln sind jetzt mit offiziellen Quellen hinterlegt. Für einen konkreten Punkt können zusätzliche Schutzgebiets-, Eigentümer-, Platz- oder Waldbrandregeln gelten. Bei der Hängematte zeigt die App deshalb bewusst keine pauschale Erlaubnis an.</div>
  <div class="source">Quellen: Landesforsten Rheinland-Pfalz; Biosphärenreservat Pfälzerwald. Stand: 22.08.2026.</div>`;
- showAppModal();
+ $('#modal').classList.remove('hidden');
 }
 
 
-/* ===== V3.6.4 Tour-Cockpit / Anreise / Backup / Werkzeuge ===== */
+/* ===== V3.6.0 Tour-Cockpit / Anreise / Backup / Werkzeuge ===== */
 
 function v28RouteName(){
  return $('#routeName')?.textContent || 'Tour';
@@ -4875,7 +4579,7 @@ function openTourCockpit(){
  const distStart=navigationSession.active?distanceToTourStartKm():null;
 
  $('#modalBody').innerHTML=`
- <span class="tag">🎛 Tour-Cockpit · V3.6.4</span>
+ <span class="tag">🎛 Tour-Cockpit · V3.6.0</span>
  <h2>${escapeHtml(v28RouteName())}</h2>
 
  <div class="cockpitHero">
@@ -4920,8 +4624,8 @@ function openTourCockpit(){
    ${v28PoiMini(emergency)}
  </div>`;
 
- showAppModal();
- $('#cpPois').onclick=async()=>{ closeAppModal(); await loadPois(false); };
+ $('#modal').classList.remove('hidden');
+ $('#cpPois').onclick=async()=>{ $('#modal').classList.add('hidden'); await loadPois(false); };
  $('#cpPlan').onclick=openMapPlanner;
  $('#cpSafety').onclick=openWarningCenter;
  $('#cpProfile').onclick=openElevationProfile;
@@ -5024,7 +4728,7 @@ function openV28Tools(message=''){
  const net=v28NetworkStatus();
  const backups=Object.keys(v28BackupPayload().storage).length;
  $('#modalBody').innerHTML=`
- <span class="tag">🧰 Werkzeuge · V3.6.4</span>
+ <span class="tag">🧰 Werkzeuge · V3.6.0</span>
  <h2>App & Route</h2>
  ${message?`<div class="backupStatus">${escapeHtml(message)}</div>`:''}
  <div class="toolCard">
@@ -5062,7 +4766,7 @@ function openV28Tools(message=''){
      <button id="warningV28">Warncenter</button>
    </div>
  </div>`;
- showAppModal();
+ $('#modal').classList.remove('hidden');
  $('#backupExport').onclick=exportV28Backup;
  $('#backupImport').onclick=importV28Backup;
  $('#routeReverse').onclick=reverseCurrentRoute;
