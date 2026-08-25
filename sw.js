@@ -1,5 +1,5 @@
-const SHELL='trek-sleep-v360-clean';
-const RUNTIME='trek-sleep-v360-runtime';
+const SHELL='trek-sleep-v3601-clean';
+const RUNTIME='trek-sleep-v3601-runtime';
 const ASSETS=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest'];
 
 self.addEventListener('install',event=>{

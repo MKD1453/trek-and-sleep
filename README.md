@@ -1,32 +1,16 @@
-# Trek & Sleep V3.6.0 — Clean Rebuild
+# Trek & Sleep V3.6.0.1 — Clean Maintenance Fix
 
-Dieser Build wurde ausschließlich aus dem auf dem iPhone zuvor erfolgreich getesteten
-V3.4.1-Stand erstellt. Es wurde kein Code aus V3.5.x oder den späteren fehlerhaften
-V3.6.x-Patches übernommen.
+Basis bleibt der V3.4.1-Clean-Rebuild. Keine V3.5/V3.6-Patcharchitektur wurde übernommen.
 
-## Enthalten
-- Karte / GPX / POIs
-- Tour- und Punkteplanung
-- Etappen
-- Navigationsassistenz
-- Live-Navigation
-- V3.2.4-Simulator
-- V3.3.2-Track-Aufzeichnung und GPX-Export
-- V3.4.1-Jagdcenter
+Gezielt behoben:
+- Etappen öffnen auch ohne Höhenprofil; fehlende Höhe wird als „—“ angezeigt.
+- Safari-AudioContext wird beim Test aus dem Fingertipp heraus resumed.
+- Sprachtest nutzt speechSynthesis direkt aus dem Fingertipp und kann unabhängig vom AN/AUS-Zustand getestet werden.
+- Live-HUD und Jagd-HUD werden nicht mehr alle 2/5 Sekunden blind per outerHTML ersetzt; DOM wird nur bei tatsächlicher Änderung aktualisiert.
 
-## Bewusst nicht übernommen
-- Jagd-Radar-Testzone aus V3.5.x
-- spätere zentrale Modal-Manager
-- UI-Watchdogs
-- Pointer-/Touch-Fallback-Kaskaden
-- spätere Simulator-Patches
-
-## Kleine Bereinigungen
-- Jagd-Button besitzt nur noch eine Event-Bindung statt Fallback + Hauptbindung.
-- komplett neue Service-Worker-Cache-Namen
-- App-Dateien werden online network-first geladen; offline erfolgt Cache-Fallback.
-
-## Testreihenfolge
-Zuerst ohne Simulator: Tour planen, Punkte planen, Etappen, Assistenz, Live, Track, Jagd.
-Danach Simulator: Start, Pause, ±100 m, nächster Hinweis, mehrere Kurven.
-Erst danach Fenster während laufender Simulation öffnen.
+Nicht verändert:
+- Simulatorlogik
+- Track-Aufzeichnung
+- Jagdcenter-Berechnung
+- Tour-/Punkteplanung
+- Modal-System
